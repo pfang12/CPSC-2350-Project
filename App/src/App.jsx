@@ -1,7 +1,9 @@
 import "./App.css";
+import Button from "react-bootstrap/Button";
+import Home from "./pages/Home";
 
 function App() {
-  return <h1>hi there</h1>;
+  return <Home />;
 }
 
 export default App;
