@@ -1,12 +1,18 @@
-import React from "react";
 import Button from "react-bootstrap/esm/Button";
 import Form from "react-bootstrap/Form";
+import axios from 'axios';
 import { useState } from "react";
 
 function InputComponent() {
   const [fileState, setFileState] = useState("text");
   const [numberQuestions, setNumberQuestions] = useState("5");
-  const [questionType, setQuestionType] = useState("multi");
+  const [questionType, setQuestionType] = useState("multiple choice");
+
+  const [gptInput, setGptInput] = useState("")
+  const [gptResponse, setGptResponse] = useState(null);
+
+  const jsonTemplate = "{'questions': [{'question': '','options': ['', '', '', ''],'answer': ''},{'question': '','options': ['', '', '', ''],'answer': ''}]}";
+
   function changeState(val) {
     setFileState(val);
   }
@@ -16,9 +22,44 @@ function InputComponent() {
   function typeQuestion(e) {
     setQuestionType(e.target.value);
   }
+  function changeGptInput(e) {
+    setGptInput(e.target.value);
+  }
+
+  function generatePrompt(){
+
+    return `generate ${numberQuestions} questions of type ${questionType} based on this text: ${gptInput}. Return answer as json like: ${jsonTemplate}`
+  }
+
   function getQuiz() {
+    gptRequest();
     console.log("submitted Quiz");
   }
+
+  const gptRequest = async () => {
+    const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_KEY;
+    
+    const prompt = generatePrompt();
+
+    const data = {
+      model:"gpt-3.5-turbo",
+      messages: [{role:"user", content: prompt}],
+    }
+
+    try{
+      const response = await axios.post('https://api.openai.com/v1/chat/completions', data, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${OPENAI_API_KEY}`
+        }
+      });
+      console.log(response.data.choices[0].message.content);
+      setGptResponse(response.data.choices[0].message.content)
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
   return (
     <div className="p-4">
       {/* buttons */}
@@ -46,6 +87,7 @@ function InputComponent() {
                 as="textarea"
                 rows={7}
                 placeholder="Enter the Text"
+                onChange={changeGptInput}
               />
             </Form.Group>
           ) : (
@@ -62,8 +104,8 @@ function InputComponent() {
             </Form.Select>
             <Form.Select className="w-25" onChange={typeQuestion}>
               <option>Type</option>
-              <option value="multi">Multi-choice Questions</option>
-              <option value="true">True/False</option>
+              <option value="multiple choice">Multi-choice Questions</option>
+              <option value="true or false">True/False</option>
             </Form.Select>
             <Button variant="outline-primary" onClick={() => getQuiz()}>
               Submit
@@ -71,6 +113,7 @@ function InputComponent() {
           </div>
         </Form>
       </div>
+      <p>{gptResponse}</p>
     </div>
   );
 }
