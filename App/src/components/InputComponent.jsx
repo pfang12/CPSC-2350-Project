@@ -2,9 +2,11 @@ import Button from "react-bootstrap/esm/Button";
 import Form from "react-bootstrap/Form";
 import axios from 'axios';
 import { useState } from "react";
+import pdfHandler from "../scripts/pdfHandler";
 
 function InputComponent() {
   const [fileState, setFileState] = useState("text");
+  const [file, setFile] = useState(null);
   const [numberQuestions, setNumberQuestions] = useState("5");
   const [questionType, setQuestionType] = useState("multiple choice");
 
@@ -16,6 +18,7 @@ function InputComponent() {
   function changeState(val) {
     setFileState(val);
   }
+
   function numQuestion(e) {
     setNumberQuestions(e.target.value);
   }
@@ -32,7 +35,26 @@ function InputComponent() {
   }
 
   function getQuiz() {
-    gptRequest();
+
+    if(fileState === "file" && file){
+      console.log(file);
+
+      const extractText = async () => {
+        const signed_token = await pdfHandler.authPDF_API();
+        
+        const server_data = await pdfHandler.startServer("extract", signed_token);
+
+        const {task, server} = server_data
+
+        const server_filename = await pdfHandler.uploadToServer(file, task, server, signed_token);
+        
+        console.log(server_filename);
+      }
+      extractText();
+    } else {
+      gptRequest();
+    }
+
     console.log("submitted Quiz");
   }
 
@@ -56,7 +78,7 @@ function InputComponent() {
       console.log(response.data.choices[0].message.content);
       setGptResponse(response.data.choices[0].message.content)
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error: ', error);
     }
   }
 
@@ -92,7 +114,7 @@ function InputComponent() {
             </Form.Group>
           ) : (
             <Form.Group controlId="formFile" className="mb-3">
-              <Form.Control type="file" accept=".txt, .docx, .doc, .pdf" />
+              <Form.Control type="file" accept=".txt, .docx, .doc, .pdf" onChange={(e) => setFile(e.target.files[0])}/>
             </Form.Group>
           )}
           <div className="d-flex justify-content-between">
