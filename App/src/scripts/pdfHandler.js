@@ -47,12 +47,58 @@ const uploadToServer = async (file, task, server, token) => {
     }
 }
 
-const processFile = (token) => {
+const processFile = async (filename, server_filename, task, server, tool, token) => {
 
+    const requestBody = {
+        task: task,
+        tool: tool,
+        files: [{
+            server_filename: server_filename,
+            filename: filename
+        }]
+    };
+    
+    try{
+        console.log("processing file...")
+        const response = await axios.post(`https://${server}/v1/process`, requestBody, {headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+        }})
+
+        return response.data 
+    }catch(error){
+        console.error('Error: ', error);
+    }
 }
 
-const downloadFiles = (token) => {
+const downloadFiles = async (task, server, token) => {
 
+    try{
+        console.log("downloading...")
+        const response = await axios.get(`https://${server}/v1/download/${task}`, {headers: {
+            'Authorization': `Bearer ${token}`
+        }})
+
+        return response.data 
+    } catch(error){
+        console.error('Error: ', error)
+    }
+}
+
+const deleteFileFromServer = async (task, server, server_filename, token) => {
+    
+    try{
+        console.log("deleting file from server...")
+        const response = await axios.delete(`https://${server}/v1/upload/${task}/${server_filename}`, {headers: {
+            'Authorization': `Bearer ${token}`
+        }})
+
+        if(response.ok){
+            console.log("File deleted from server!")
+        }
+    } catch(error){
+        console.error('Error: ', error)
+    }
 }
 
 export default {
@@ -60,5 +106,6 @@ export default {
     startServer,
     uploadToServer,
     processFile,
-    downloadFiles
+    downloadFiles,
+    deleteFileFromServer
 }

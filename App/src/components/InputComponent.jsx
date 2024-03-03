@@ -1,7 +1,7 @@
 import Button from "react-bootstrap/esm/Button";
 import Form from "react-bootstrap/Form";
 import axios from 'axios';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import pdfHandler from "../scripts/pdfHandler";
 
 function InputComponent() {
@@ -46,15 +46,21 @@ function InputComponent() {
 
         const {task, server} = server_data
 
-        const server_filename = await pdfHandler.uploadToServer(file, task, server, signed_token);
+        const server_file_data = await pdfHandler.uploadToServer(file, task, server, signed_token);
+
+        const server_filename = server_file_data.server_filename;
         
-        console.log(server_filename);
+        await pdfHandler.processFile(file.name, server_filename, task, server, "extract", signed_token);
+
+        const extracted_text = await pdfHandler.downloadFiles(task, server, signed_token)
+
+        setGptInput(extracted_text)
       }
       extractText();
     } else {
       gptRequest();
     }
-
+    
     console.log("submitted Quiz");
   }
 
@@ -81,6 +87,13 @@ function InputComponent() {
       console.error('Error: ', error);
     }
   }
+
+  useEffect(() => {
+    if(fileState === "file" && gptInput !== ""){
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      gptRequest();
+    }
+  }, [fileState, gptInput])
 
   return (
     <div className="p-4">
