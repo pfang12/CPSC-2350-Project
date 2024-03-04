@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { gptRequest } from "../api/gptapi";
 import { extractText } from "../api/pdfapi";
 import { QuizContext } from "../context/QuizContext";
@@ -12,10 +12,8 @@ function InputComponent() {
   const { quiz, setQuiz } = useContext(QuizContext);
   const navigate = useNavigate();
   const [fileState, setFileState] = useState("text");
-  const [file, setFile] = useState(null);
   const [numberQuestions, setNumberQuestions] = useState("5");
   const [questionType, setQuestionType] = useState("multiple choice");
-
   const [gptInput, setGptInput] = useState("");
 
   function changeState(val) {
@@ -33,31 +31,33 @@ function InputComponent() {
   }
   const gptCallResponse = async () => {
     setQuiz("");
+    console.log(gptInput);
     const res = await gptRequest(numberQuestions, questionType, gptInput);
     console.log(res);
     const jres = JSON.parse(res);
     console.log(jres.questions);
     setQuiz(jres.questions);
   };
+  function gettingFileValue(e) {
+    console.log(e.target.files[0]);
+    const extract = async () => {
+      const res = await extractText(e.target.files[0]);
+      console.log(res);
+      setGptInput(res);
+    };
+    extract();
+  }
+
   function getQuiz() {
-    if (fileState === "file" && file) {
-      console.log(file);
-
-      const extract = async () => {
-        const res = await extractText(file);
-        setGptInput(res);
-      };
-      extract();
-    } else gptCallResponse();
-
+    gptCallResponse();
     console.log("submitted Quiz");
   }
-  useEffect(() => {
-    if (fileState === "file" && gptInput !== "") {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      gptCallResponse();
-    }
-  }, [fileState, gptInput]);
+  // useEffect(() => {
+  //   if (fileState === "file" && gptInput !== "") {
+  //     // eslint-disable-next-line react-hooks/exhaustive-deps
+  //     gptCallResponse();
+  //   }
+  // }, [fileState, gptInput]);
   function attemptQuiz() {
     navigate("/attempt");
   }
@@ -97,7 +97,7 @@ function InputComponent() {
               <Form.Control
                 type="file"
                 accept=".txt, .docx, .doc, .pdf"
-                onChange={(e) => setFile(e.target.files[0])}
+                onChange={(e) => gettingFileValue(e)}
               />
             </Form.Group>
           )}
@@ -113,7 +113,11 @@ function InputComponent() {
               <option value="multiple choice">Multi-choice Questions</option>
               <option value="true or false">True/False</option>
             </Form.Select>
-            <Button variant="outline-primary" onClick={() => getQuiz()}>
+            <Button
+              variant="outline-primary"
+              onClick={() => getQuiz()}
+              disabled={!gptInput}
+            >
               Submit
             </Button>
           </div>
