@@ -1,11 +1,11 @@
 import axios from "axios";
 
 const jsonTemplate =
-  "{'questions': [{'question': '','options': ['', '', '', ''],'answer': ''},{'question': '','options': ['', '', '', ''],'answer': ''}]}";
+  "{questions: [{'question': '','options': ['', '', '', ''],'answer': ''},{'question': '','options': ['', '', '', ''],'answer': ''}]}";
 
 // function for generating prompt for the chatGpt
 function generatePrompt(numberQuestions, questionType, gptInput) {
-  return `generate ${numberQuestions} questions of type ${questionType} based on this text: ${gptInput}. Return answer as json like: ${jsonTemplate}`;
+  return `generate ${numberQuestions} questions of type ${questionType} based on this text: ${gptInput}. Return answer as json like: ${jsonTemplate} replacing single quotes with double quotes`;
 }
 
 //function to call chat gpt

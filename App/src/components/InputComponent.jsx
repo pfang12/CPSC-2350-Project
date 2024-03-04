@@ -1,19 +1,22 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { gptRequest } from "../api/gptapi";
 import { extractText } from "../api/pdfapi";
+import { QuizContext } from "../context/QuizContext";
 
 // bootstrap
 import Button from "react-bootstrap/esm/Button";
 import Form from "react-bootstrap/Form";
+import { useNavigate } from "react-router-dom";
 
 function InputComponent() {
+  const { quiz, setQuiz } = useContext(QuizContext);
+  const navigate = useNavigate();
   const [fileState, setFileState] = useState("text");
   const [file, setFile] = useState(null);
   const [numberQuestions, setNumberQuestions] = useState("5");
   const [questionType, setQuestionType] = useState("multiple choice");
 
   const [gptInput, setGptInput] = useState("");
-  const [gptResponse, setGptResponse] = useState(null);
 
   function changeState(val) {
     setFileState(val);
@@ -30,7 +33,10 @@ function InputComponent() {
   }
   const gptCallResponse = async () => {
     const res = await gptRequest(numberQuestions, questionType, gptInput);
-    setGptResponse(res);
+    console.log(res);
+    const jres = JSON.parse(res);
+    console.log(jres.questions);
+    setQuiz(jres.questions);
   };
   function getQuiz() {
     if (fileState === "file" && file) {
@@ -41,19 +47,19 @@ function InputComponent() {
         setGptInput(res);
       };
       extract();
-    } else {
-      gptCallResponse();
-    }
+    } else gptCallResponse();
 
     console.log("submitted Quiz");
   }
-
   useEffect(() => {
     if (fileState === "file" && gptInput !== "") {
       // eslint-disable-next-line react-hooks/exhaustive-deps
       gptCallResponse();
     }
   }, [fileState, gptInput]);
+  function attemptQuiz() {
+    navigate("/attempt");
+  }
 
   return (
     <div className="p-4">
@@ -112,7 +118,14 @@ function InputComponent() {
           </div>
         </Form>
       </div>
-      <p>{gptResponse}</p>
+
+      {quiz != null ? (
+        <Button variant="outline-primary" onClick={() => attemptQuiz()}>
+          take Quiz
+        </Button>
+      ) : (
+        <p>...loading</p>
+      )}
     </div>
   );
 }
