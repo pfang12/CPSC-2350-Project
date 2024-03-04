@@ -32,6 +32,7 @@ function InputComponent() {
     setGptInput(e.target.value);
   }
   const gptCallResponse = async () => {
+    setQuiz("");
     const res = await gptRequest(numberQuestions, questionType, gptInput);
     console.log(res);
     const jres = JSON.parse(res);
@@ -118,8 +119,9 @@ function InputComponent() {
           </div>
         </Form>
       </div>
-
-      {quiz != null ? (
+      {quiz == null ? (
+        <div>Ready to take quiz</div>
+      ) : quiz != "" ? (
         <Button variant="outline-primary" onClick={() => attemptQuiz()}>
           take Quiz
         </Button>
