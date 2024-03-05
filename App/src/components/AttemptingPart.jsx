@@ -1,6 +1,12 @@
 import Form from "react-bootstrap/Form";
 export default function AttemptingPart({ question, passValue, index }) {
   console.log(question);
+  function giveHint() {
+    // api here
+  }
+  function explainQuestion() {
+    // api here
+  }
 
   return (
     <div>
@@ -23,6 +29,8 @@ export default function AttemptingPart({ question, passValue, index }) {
             </div>
           ))}
         </Form>
+        <div onClick={giveHint}>Hint</div>
+        <div onClick={explainQuestion}>explanation</div>
       </div>
     </div>
   );

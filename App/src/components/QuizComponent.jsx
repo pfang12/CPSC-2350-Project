@@ -1,5 +1,5 @@
 import Button from "react-bootstrap/esm/Button";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { QuizContext } from "../context/QuizContext";
 
 import AttemptingPart from "./AttemptingPart";
@@ -8,13 +8,29 @@ import { useNavigate } from "react-router-dom";
 function QuizComponent() {
   const navigate = useNavigate();
   const { quiz, setQuiz } = useContext(QuizContext);
+  useEffect(() => {
+    checkQuiz();
+    updateAdvancedQuiz();
+  }, [quiz]);
 
-  const advancedQuiz = quiz.map((question) => ({
-    ...question,
-    userResponse: "",
-    attempted: false,
-  }));
-  const [quizMaterial, setQuizMaterial] = useState(advancedQuiz);
+  function checkQuiz() {
+    if (quiz.length === 0) {
+      navigate("/*");
+    }
+  }
+
+  const updateAdvancedQuiz = () => {
+    const advancedQuiz = quiz
+      ? quiz.map((question) => ({
+          ...question,
+          userResponse: "",
+          attempted: false,
+        }))
+      : [];
+    setQuizMaterial(advancedQuiz);
+  };
+
+  const [quizMaterial, setQuizMaterial] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const questionValue = quizMaterial[currentQuestionIndex];
 
@@ -44,25 +60,30 @@ function QuizComponent() {
     navigate("/result");
   }
 
-  return (
+  return quiz.length == 0 ? (
+    <div>Something went wrong</div>
+  ) : (
     <div>
       <AttemptingPart
         question={questionValue}
         passValue={passValue}
         index={currentQuestionIndex}
       />
-      <button type="button" className="btn btn-primary" onClick={backPage}>
-        Back
-      </button>
-      <button type="button" className="btn btn-primary" onClick={nextPage}>
-        Next
-      </button>
-      {quizMaterial.length - 1 == currentQuestionIndex ? (
+      {currentQuestionIndex > 0 && (
+        <button type="button" className="btn btn-primary" onClick={backPage}>
+          Back
+        </button>
+      )}
+      {currentQuestionIndex < quizMaterial.length - 1 && (
+        <button type="button" className="btn btn-primary" onClick={nextPage}>
+          Next
+        </button>
+      )}
+
+      {quizMaterial.length - 1 == currentQuestionIndex && (
         <button type="button" className="btn btn-primary" onClick={submit}>
           Submit
         </button>
-      ) : (
-        <></>
       )}
     </div>
   );

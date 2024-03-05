@@ -30,7 +30,7 @@ function InputComponent() {
     setGptInput(e.target.value);
   }
   const gptCallResponse = async () => {
-    setQuiz("");
+    setQuiz(["loading"]);
     console.log(gptInput);
     const res = await gptRequest(numberQuestions, questionType, gptInput);
     console.log(res);
@@ -52,12 +52,7 @@ function InputComponent() {
     gptCallResponse();
     console.log("submitted Quiz");
   }
-  // useEffect(() => {
-  //   if (fileState === "file" && gptInput !== "") {
-  //     // eslint-disable-next-line react-hooks/exhaustive-deps
-  //     gptCallResponse();
-  //   }
-  // }, [fileState, gptInput]);
+
   function attemptQuiz() {
     navigate("/attempt");
   }
@@ -123,9 +118,9 @@ function InputComponent() {
           </div>
         </Form>
       </div>
-      {quiz == null ? (
+      {quiz.length == 0 ? (
         <div>Ready to take quiz</div>
-      ) : quiz != "" ? (
+      ) : quiz[0] != "loading" ? (
         <Button variant="outline-primary" onClick={() => attemptQuiz()}>
           take Quiz
         </Button>
