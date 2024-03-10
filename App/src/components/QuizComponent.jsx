@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 function QuizComponent() {
   const navigate = useNavigate();
   const { quiz, setQuiz } = useContext(QuizContext);
+  console.log(quiz);
   useEffect(() => {
     checkQuiz();
     updateAdvancedQuiz();
@@ -60,7 +61,7 @@ function QuizComponent() {
     navigate("/result");
   }
 
-  return quiz.length == 0 ? (
+  return quiz.length == 0 || questionValue == null ? (
     <div>Something went wrong</div>
   ) : (
     <div>

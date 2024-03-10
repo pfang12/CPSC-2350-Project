@@ -1,4 +1,4 @@
-import pdfHandler from "../scripts/pdfHandler";
+import pdfHandler from "./pdfHandler";
 export const extractText = async (file) => {
   const signed_token = await pdfHandler.authPDF_API();
 
