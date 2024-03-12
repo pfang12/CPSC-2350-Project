@@ -1,10 +1,10 @@
 header {
-    font-family: 'Oswald', sans-serif;
+    font-family: 'Oswald', sans-serif !important;
 }
 
 body {
-    font-family: 'Garamond', sans-serif;
-    background-color: #f5f5f5; /* Light grey background for the entire page */
+    font-family: 'Garamond', sans-serif !important;
+    background-color: #f5f5f5 !important; /* Light grey background for the entire page */
 }
 
 .navbar {
