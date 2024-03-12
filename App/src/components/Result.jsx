@@ -25,7 +25,7 @@ function Result() {
   return (
     <div>
       <h1>
-        your score {getScore()} / {quiz.length}
+        Your Score {getScore()} / {quiz.length}
       </h1>
       {quiz.map((data, i) => (
         <DisplayQuiz data={data} key={i} index={i + 1} />
