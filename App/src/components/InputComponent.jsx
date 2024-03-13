@@ -15,6 +15,7 @@ function InputComponent() {
   const [numberQuestions, setNumberQuestions] = useState("5");
   const [questionType, setQuestionType] = useState("multiple choice");
   const [gptInput, setGptInput] = useState("");
+  const [checkbox, setCheckbox] = useState(false);
 
   function changeState(val) {
     setFileState(val);
@@ -55,6 +56,14 @@ function InputComponent() {
 
   function attemptQuiz() {
     navigate("/attempt");
+  }
+  //download function
+  function downloadPdf() {
+    if (checkbox) {
+      //for the answer key
+    } else {
+      //without the answer key
+    }
   }
 
   return (
@@ -121,9 +130,22 @@ function InputComponent() {
       {quiz.length == 0 ? (
         <div>Ready to take quiz</div>
       ) : quiz[0] != "loading" ? (
-        <Button variant="outline-primary" onClick={() => attemptQuiz()}>
-          take Quiz
-        </Button>
+        <div>
+          <Button variant="outline-primary" onClick={() => attemptQuiz()}>
+            take Quiz
+          </Button>
+          <Button variant="outline-primary" onClick={() => downloadPdf()}>
+            Download the pdf file
+          </Button>
+          <Form.Check
+            inline
+            label="With Answers"
+            name="group1"
+            type="checkbox"
+            id="checkboxPdfAnswer"
+            onChange={() => setCheckbox(!checkbox)}
+          />
+        </div>
       ) : (
         <p>...loading</p>
       )}

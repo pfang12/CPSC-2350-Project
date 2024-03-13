@@ -1,36 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Button } from 'react-bootstrap';
-import '../styles/AttemptingPart.css';
+import React, { useEffect, useState } from "react";
+import { Card, Button } from "react-bootstrap";
+import "../styles/AttemptingPart.css";
 
-export default function AttemptingPart({ question, passValue, index, goToNextQuestion }) {
-  const [selectedValue, setSelectedValue] = useState('');
-  const [revealAnswer, setRevealAnswer] = useState(false);
+export default function AttemptingPart({ question, passValue, index }) {
+  const [selectedValue, setSelectedValue] = useState("");
 
   useEffect(() => {
-    setSelectedValue('');
-    setRevealAnswer(false);
+    setSelectedValue("");
   }, [question]);
 
   const handleOptionSelect = (option) => {
+    console.log(option);
+    question.userResponse = option;
     setSelectedValue(option);
-  };
-
-  const handleSubmit = () => {
-    passValue(selectedValue);
-    setRevealAnswer(true);
-  };
-
-  const getButtonVariant = (option) => {
-    if (revealAnswer) {
-      if (option === question.answer) {
-        return 'success';
-      }
-      if (option === selectedValue) {
-        return 'danger';
-      }
-      return 'outline-secondary';
-    }
-    return option === selectedValue ? 'info' : 'outline-primary';
   };
 
   return (
@@ -43,25 +25,20 @@ export default function AttemptingPart({ question, passValue, index, goToNextQue
           {question.options.map((option, idx) => (
             <Button
               key={idx}
-              variant={getButtonVariant(option)}
+              variant={option === selectedValue ? "info" : "outline-primary"}
               className="option-button"
               onClick={() => handleOptionSelect(option)}
-              disabled={revealAnswer}
             >
               {option}
             </Button>
           ))}
         </div>
-        {!revealAnswer && (
-          <Button variant="primary" onClick={handleSubmit} className="submit-button">
-            Submit
-          </Button>
-        )}
+
         <div className="hint-clarification">
           <FlipCard
-          key={`clarification-${index}`} // Reset flip card when the question index changes
-          text="Need clarification?"
-          backText={question.clarification || "No clarification available."}
+            key={`clarification-${index}`} // Reset flip card when the question index changes
+            text="Need clarification?"
+            backText={question.clarification || "No clarification available."}
           />
           <FlipCard
             key={`hint-${index}`} // Reset flip card when the question index changes
@@ -79,18 +56,14 @@ function FlipCard({ text, backText }) {
   const [isFlipped, setIsFlipped] = useState(false);
 
   return (
-    <div className={`flip-card ${isFlipped ? 'flipped' : ''}`} onClick={() => setIsFlipped(!isFlipped)}>
+    <div
+      className={`flip-card ${isFlipped ? "flipped" : ""}`}
+      onClick={() => setIsFlipped(!isFlipped)}
+    >
       <div className="flip-card-inner">
-        <div className="flip-card-front">
-          {text}
-        </div>
-        <div className="flip-card-back">
-          {backText}
-        </div>
+        <div className="flip-card-front">{text}</div>
+        <div className="flip-card-back">{backText}</div>
       </div>
     </div>
   );
 }
-
-
-
