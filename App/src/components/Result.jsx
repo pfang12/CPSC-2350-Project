@@ -63,6 +63,11 @@ export const DisplayQuiz = ({ data, index }) => {
                 checked={data.userResponse === value}
                 readOnly
               />
+              <p>
+                {
+                  data.answer === value && data.userResponse === value ? "" : data.answer === value ? data.explanation : ""
+                }
+              </p>
             </div>
           ))}
         </Form>
