@@ -36,11 +36,6 @@ export default function AttemptingPart({ question, passValue, index }) {
 
         <div className="hint-clarification">
           <FlipCard
-            key={`clarification-${index}`} // Reset flip card when the question index changes
-            text="Need clarification?"
-            backText={question.clarification || "No clarification available."}
-          />
-          <FlipCard
             key={`hint-${index}`} // Reset flip card when the question index changes
             text="Hint?"
             backText={question.hint || "No hints available."}
