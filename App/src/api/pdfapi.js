@@ -1,34 +1,59 @@
-import pdfHandler from "./pdfHandler";
-export const extractText = async (file) => {
-  const signed_token = await pdfHandler.authPDF_API();
+import axios from "axios";
+import qs from "qs";
 
-  const server_data = await pdfHandler.startServer("extract", signed_token);
+const clientID = import.meta.env.VITE_PDF_CLIENT_ID;
+const clientSecret = import.meta.env.VITE_PDF_CLIENT_SECRET;
 
-  const { task, server } = server_data;
+// Adobe PDF Services API access token generation
+const generateAccessToken = async () => {
+    console.log("generating access token...");
 
-  const server_file_data = await pdfHandler.uploadToServer(
-    file,
-    task,
-    server,
-    signed_token
-  );
+    const apiURL = "https://pdf-services-ue1.adobe.io/token";
 
-  const server_filename = server_file_data.server_filename;
+    const data = {
+        "client_id": clientID,
+        "client_secret": clientSecret
+    }
 
-  await pdfHandler.processFile(
-    file.name,
-    server_filename,
-    task,
-    server,
-    "extract",
-    signed_token
-  );
+    try{
+        const response = await axios.post(apiURL, qs.stringify(data), {
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+        });
+             
+        return response.data.access_token;
+    }catch(error){
+        console.error("Error: ", error);
+    }
+};
 
-  const extracted_text = await pdfHandler.downloadFiles(
-    task,
-    server,
-    signed_token
-  );
+// generate presignedURI to upload files
+export const generatePresignedURI = async (token) => {
+    const apiURL = "https://pdf-services-ue1.adobe.io/assets";
 
-  return extracted_text;
+    const data = {
+        "mediaType": "application/pdf"
+    }
+
+    try{
+        const response = await axios.post(apiURL, data, {
+            headers: {
+                "Authorization": token,
+                "x-api-key": clientID,
+                "Content-Type": "application/json"
+            }
+        });
+
+        console.log(response);
+    } catch(error){
+        console.log("Error: ", error);
+    }
+}
+
+// text extraction function
+export const extractText = async () => {
+    const token = await generateAccessToken();
+    //console.log(token);
+    generatePresignedURI(token);
 };
