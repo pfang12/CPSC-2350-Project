@@ -42,10 +42,8 @@ function InputComponent() {
   function gettingFileValue(e) {
     console.log(e.target.files[0]);
     const extract = async () => {
-      await extractText(e.target.files[0]);
-      //const res = await extractText(e.target.files[0]);
-      //console.log(res);
-      //setGptInput(res);
+      const res = await extractText(e.target.files[0]);
+      setGptInput(res);
     };
     extract();
   }

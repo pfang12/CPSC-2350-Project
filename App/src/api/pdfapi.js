@@ -140,7 +140,15 @@ const downloadData = async(downloadURI) => {
 
         const jsonData = JSON.parse(fileContent);
 
-        console.log(jsonData);
+        const elements = jsonData.elements;
+
+        let extractedText = "";
+
+        elements.forEach(element => {
+            extractedText += element.Text;
+        })
+
+        return extractedText;
 
     }catch(error){
         console.log("Error: ", error);
@@ -158,7 +166,9 @@ export const extractText = async (file) => {
     if(uploadSuccessful === 200){
         const downloadUri = await startExtractJob(token, assetID);
 
-        downloadData(downloadUri);
+        const text = await downloadData(downloadUri);
+        return text;
+        
     } else {
         console.log("Something went wrong uploading the file.");
     }
