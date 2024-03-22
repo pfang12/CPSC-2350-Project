@@ -28,8 +28,10 @@ const generateAccessToken = async () => {
     }
 };
 
-// generate presignedURI to upload files
-export const generatePresignedURI = async (token) => {
+// generate presignedURI to upload files and assetID to locate files 
+const generatePresignedURI = async (token) => {
+    console.log("generating presigned URI...");
+
     const apiURL = "https://pdf-services-ue1.adobe.io/assets";
 
     const data = {
@@ -45,15 +47,81 @@ export const generatePresignedURI = async (token) => {
             }
         });
 
-        console.log(response);
+        return response.data;
+    } catch(error){
+        console.log("Error: ", error);
+    }
+}
+
+// upload file to presignedURI
+const uploadFile = async (file, uploadURI) => {
+    console.log("uploading to presigned URI...");
+
+    try{
+        const response = await axios.put(uploadURI, file, {
+            headers: {
+                "Content-Type": "application/pdf"
+            }
+        });
+
+        return response.status;
     } catch(error){
         console.log("Error: ", error);
     }
 }
 
 // text extraction function
-export const extractText = async () => {
+export const extractText = async (file) => {
     const token = await generateAccessToken();
-    //console.log(token);
-    generatePresignedURI(token);
+
+    const {uploadUri, assetID} = await generatePresignedURI(token);
+
+    const uploadSuccessful = await uploadFile(file, uploadUri);
+
+    if(uploadSuccessful === 200){
+        console.log("Attempting text extraction...");
+
+        const apiURL = "https://pdf-services-ue1.adobe.io/operation/extractpdf";
+
+        const data = {
+            "assetID": assetID,
+            "elementsToExtract": ["text"]
+        };
+
+        try {
+            // starts the extraction job on Adobe's servers
+            const response = await axios.post(apiURL, data, {
+                headers: {
+                    "Authorization": token,
+                    "x-api-key": clientID,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            console.log("polling for job completion...");
+            let jobStatus;
+            let result;
+            do{
+                // checks for poll completion status
+                result = await axios.get(response.headers.location, {
+                    headers: {
+                        "Authorization": token,
+                        "x-api-key": clientID,
+                    },
+                });
+
+                jobStatus = result.data.status;
+                console.log("Current job status: ", jobStatus);
+
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }while(jobStatus !== "done" && jobStatus !== "failed");
+
+            console.log(result);
+
+        } catch (error) {
+            console.log("Error: ", error);
+        }
+    } else {
+        console.log("Something went wrong uploading the file.");
+    }
 };
