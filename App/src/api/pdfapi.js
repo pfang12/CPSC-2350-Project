@@ -1,5 +1,6 @@
 import axios from "axios";
 import qs from "qs";
+import jsZip from "jszip";
 
 const clientID = import.meta.env.VITE_PDF_CLIENT_ID;
 const clientSecret = import.meta.env.VITE_PDF_CLIENT_SECRET;
@@ -70,6 +71,82 @@ const uploadFile = async (file, uploadURI) => {
     }
 }
 
+// extracts text and generates compressed JSON file 
+const startExtractJob = async(token, assetID) => {
+    console.log("Attempting text extraction...");
+
+    const apiURL = "https://pdf-services-ue1.adobe.io/operation/extractpdf";
+
+    const data = {
+        assetID: assetID,
+        elementsToExtract: ["text"],
+    };
+
+    try {
+        // starts the extraction job on Adobe's servers
+        const response = await axios.post(apiURL, data, {
+            headers: {
+                Authorization: token,
+                "x-api-key": clientID,
+                "Content-Type": "application/json",
+            },
+        });
+
+        console.log("polling for job completion...");
+        let jobStatus;
+        let result;
+        do {
+            // checks for poll completion status
+            result = await axios.get(response.headers.location, {
+                headers: {
+                    Authorization: token,
+                    "x-api-key": clientID,
+                },
+            });
+
+            jobStatus = result.data.status;
+            console.log("Current job status: ", jobStatus);
+
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+        } while (jobStatus !== "done" && jobStatus !== "failed");
+
+        if (jobStatus === "done") {
+            return result.data.resource.downloadUri;
+        } else if (jobStatus === "failed") {
+            console.log("Text extraction failed :(");
+            console.log("Code: ", result.data.error.code);
+            console.log("Message: ", result.data.error.message);
+        }
+    } catch (error) {
+        console.log("Error: ", error);
+    }
+}
+
+// decompress and return data
+const downloadData = async(downloadURI) => {
+    console.log("downloading...")
+
+    try{
+        const response = await axios.get(downloadURI, {
+            responseType: "arraybuffer"
+        });
+
+        const zip = await jsZip.loadAsync(response.data);
+
+        const fileName = Object.keys(zip.files)[0];
+        const file = zip.files[fileName];
+
+        const fileContent = await file.async("text");
+
+        const jsonData = JSON.parse(fileContent);
+
+        console.log(jsonData);
+
+    }catch(error){
+        console.log("Error: ", error);
+    }
+}
+
 // text extraction function
 export const extractText = async (file) => {
     const token = await generateAccessToken();
@@ -79,48 +156,9 @@ export const extractText = async (file) => {
     const uploadSuccessful = await uploadFile(file, uploadUri);
 
     if(uploadSuccessful === 200){
-        console.log("Attempting text extraction...");
+        const downloadUri = await startExtractJob(token, assetID);
 
-        const apiURL = "https://pdf-services-ue1.adobe.io/operation/extractpdf";
-
-        const data = {
-            "assetID": assetID,
-            "elementsToExtract": ["text"]
-        };
-
-        try {
-            // starts the extraction job on Adobe's servers
-            const response = await axios.post(apiURL, data, {
-                headers: {
-                    "Authorization": token,
-                    "x-api-key": clientID,
-                    "Content-Type": "application/json",
-                },
-            });
-
-            console.log("polling for job completion...");
-            let jobStatus;
-            let result;
-            do{
-                // checks for poll completion status
-                result = await axios.get(response.headers.location, {
-                    headers: {
-                        "Authorization": token,
-                        "x-api-key": clientID,
-                    },
-                });
-
-                jobStatus = result.data.status;
-                console.log("Current job status: ", jobStatus);
-
-                await new Promise(resolve => setTimeout(resolve, 1000));
-            }while(jobStatus !== "done" && jobStatus !== "failed");
-
-            console.log(result);
-
-        } catch (error) {
-            console.log("Error: ", error);
-        }
+        downloadData(downloadUri);
     } else {
         console.log("Something went wrong uploading the file.");
     }
