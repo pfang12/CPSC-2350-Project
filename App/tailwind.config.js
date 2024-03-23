@@ -3,8 +3,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        logo: ["Playfair Display", "serif"],
-        roboto: ["Roboto", " sans-serif"],
+        garamound: ["EB Garamond", "serif"],
+        oswald: ["Oswald", "sans-serif"],
       },
 
       width: {
@@ -48,10 +48,13 @@ module.exports = {
         xl: "1280px",
         "2xl": "1536px",
       },
+      // all the shades and fonts are here
+      //  shades- #9b77c1,#a686c8, #bca4d6, #c8b4dd,#d3c3e3,#ded2ea
+      // tints-#825ea7,#735395,#654982,#563e70,#3a2a4a,#1d1525
+
       colors: {
         font: "#262731",
-        blue: "#768FFF",
-        primary: "#ffffff",
+        primary: "#9068ba",
       },
     },
   },
