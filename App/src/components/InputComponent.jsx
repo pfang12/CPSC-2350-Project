@@ -6,6 +6,8 @@ import { QuizContext } from "../context/QuizContext";
 // bootstrap
 import Button from "react-bootstrap/esm/Button";
 import Form from "react-bootstrap/Form";
+//
+
 import { useNavigate } from "react-router-dom";
 
 function InputComponent() {
