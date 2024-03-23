@@ -125,18 +125,18 @@ function InputComponent() {
             className="w-52 origin-bottom py-2 px-2 bg-primaryShade2 border-none text-font rounded-lg"
             onChange={numQuestion}
           >
-            <option>Number of Questions: {numberQuestions}</option>
-            <option value="5">Number of Questions: 5</option>
-            <option value="10">Number of Questions: 10</option>
-            <option value="20">Number of Questions: 20</option>
+            <option>Number of Questions:</option>
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
           </select>
           <select
             className="w-52 py-2 px-2 origin-bottom bg-primaryShade2 border-none text-font rounded-lg"
             onChange={typeQuestion}
           >
-            <option>Type :{questionType}</option>
-            <option value="multiple choice">Type: multiple-choice </option>
-            <option value="true/false">Type: True/False</option>
+            <option>Type: </option>
+            <option value="multiple choice">multiple-choice </option>
+            <option value="true/false">True/False</option>
           </select>
           <button
             onClick={() => getQuiz()}
