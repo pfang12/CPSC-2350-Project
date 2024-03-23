@@ -31,7 +31,7 @@ function InputComponent() {
   const gptCallResponse = async () => {
     setQuiz(["loading"]);
     console.log(gptInput);
-    const res = await gptRequest(numberQuestions, questionType, gptInput);
+    const res = await quizRequest(numberQuestions, questionType, gptInput);
     console.log(res);
     const jres = JSON.parse(res);
     console.log(jres.questions);
