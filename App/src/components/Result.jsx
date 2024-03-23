@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import { QuizContext } from "../context/QuizContext";
-import Form from "react-bootstrap/Form";
+
 import { useNavigate } from "react-router-dom";
 function Result() {
   const { quiz } = useContext(QuizContext);
@@ -23,15 +23,24 @@ function Result() {
   };
 
   return (
-    <div>
-      <h1>
-        Your Score {getScore()} / {quiz.length}
+    <div className="px-4 py-6">
+      <h1 className="text-xl text-font mb-6 p-4">
+        Your Score{" "}
+        <span className="text-primary">
+          {getScore()} / {quiz.length}
+        </span>
       </h1>
-      {quiz.map((data, i) => (
-        <DisplayQuiz data={data} key={i} index={i + 1} />
-      ))}
+      <div className="  px-4 py-2 border border-gray-300 rounded-lg bg-primaryShade4 mb-4">
+        {quiz.map((data, i) => (
+          <DisplayQuiz data={data} key={i} index={i + 1} />
+        ))}
+      </div>
 
-      <button type="button" className="btn btn-primary" onClick={homePage}>
+      <button
+        type="button"
+        className="text-lg cursor-pointer  text-font font-semibold py-2 px-4  bg-primary transition duration-300 ease-in-out hover:bg-primaryShade1 rounded-md "
+        onClick={homePage}
+      >
         Home Page
       </button>
     </div>
@@ -39,38 +48,31 @@ function Result() {
 }
 export const DisplayQuiz = ({ data, index }) => {
   return (
-    <div>
+    <div className="mb-6">
       <div>
-        <p>{data.question}</p>
+        <p className="text-lg mb-3">{data.question}</p>
       </div>
-      <div>
-        <Form>
-          {data.options.map((value, index) => (
-            <div key={`default-${value}`} className="mb-3">
-              <Form.Check
-                type="radio"
-                id={`default-radio-${index}`}
-                label={`${index + 1} ${value}`}
-                name="radioGroup"
-                style={{
-                  backgroundColor:
-                    data.answer === value && data.userResponse === value
-                      ? "lightgreen"
-                      : data.answer === value
-                      ? "red"
-                      : "white",
-                }}
-                checked={data.userResponse === value}
-                readOnly
-              />
-              <p>
-                {
-                  data.answer === value && data.userResponse === value ? "" : data.answer === value ? data.explanation : ""
-                }
-              </p>
-            </div>
-          ))}
-        </Form>
+      <div className="px-4">
+        {data.options.map((value, index) => (
+          <div
+            key={`default-${value}`}
+            className={`mb-2 flex items-center gap-2 ${
+              value == data.answer
+                ? "bg-green-500"
+                : value == data.userResponse && "bg-red-500"
+            } rounded-md p-2`}
+          >
+            {value == data.answer ? (
+              <span className="rounded-lg bg-green-700">✔️&nbsp;</span>
+            ) : value == data.userResponse ? (
+              <span className="rounded-lg bg-red-700">❌&nbsp;</span>
+            ) : (
+              <p className="w-7">&nbsp;</p>
+            )}
+
+            <p>{`${index + 1}. ${value}`}</p>
+          </div>
+        ))}
       </div>
     </div>
   );

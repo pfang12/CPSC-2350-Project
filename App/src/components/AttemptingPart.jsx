@@ -1,64 +1,75 @@
 import React, { useEffect, useState } from "react";
-import { Card, Button } from "react-bootstrap";
-import "../styles/AttemptingPart.css";
+import ReactCardFlip from "react-card-flip";
 
 export default function AttemptingPart({ question, passValue, index }) {
   const [selectedValue, setSelectedValue] = useState("");
 
   useEffect(() => {
-    setSelectedValue("");
+    if (question.attempted == true) setSelectedValue(question.userResponse);
+    else setSelectedValue("");
   }, [question]);
 
   const handleOptionSelect = (option) => {
     console.log(option);
-    question.userResponse = option;
     setSelectedValue(option);
+    passValue(option);
   };
 
   return (
-    <Card>
-      <Card.Body>
-        <Card.Title>
-          {index + 1}. {question.question}
-        </Card.Title>
-        <div className="options">
-          {question.options.map((option, idx) => (
-            <Button
-              key={idx}
-              variant={option === selectedValue ? "info" : "outline-primary"}
-              className="option-button"
-              onClick={() => handleOptionSelect(option)}
-            >
-              {option}
-            </Button>
-          ))}
-        </div>
+    <div>
+      <h1 className="text-2xl text-font">
+        {index + 1}. {question.question}
+      </h1>
+      <div className="flex flex-col  gap-3 py-4 px-10 mb-6">
+        {question.options.map((option, idx) => (
+          <p
+            key={idx}
+            className={` px-2 py-2 w-4/6 justify-start cursor-pointer border border-gray-300 rounded-lg ${
+              option == selectedValue ? "bg-primary" : "hover:bg-primaryShade3"
+            } `}
+            onClick={() => handleOptionSelect(option)}
+          >
+            {`${idx + 1}. ${option}`}
+          </p>
+        ))}
+      </div>
 
-        <div className="hint-clarification">
-          <FlipCard
-            key={`hint-${index}`} // Reset flip card when the question index changes
-            text="Hint?"
-            backText={question.hint || "No hints available."}
-          />
-        </div>
-      </Card.Body>
-    </Card>
+      <div className="mb-8">
+        <FlipCard
+          key={`hint-${index}`} // Reset flip card when the question index changes
+          text="Hint?"
+          backText={question.hint || "No hints available."}
+        />
+      </div>
+    </div>
   );
 }
 
 // FlipCard Component
 function FlipCard({ text, backText }) {
   const [isFlipped, setIsFlipped] = useState(false);
+  console.log(text);
+  function handleClick() {
+    setIsFlipped(!isFlipped);
+  }
 
   return (
-    <div
-      className={`flip-card ${isFlipped ? "flipped" : ""}`}
-      onClick={() => setIsFlipped(!isFlipped)}
-    >
-      <div className="flip-card-inner">
-        <div className="flip-card-front">{text}</div>
-        <div className="flip-card-back">{backText}</div>
-      </div>
+    <div>
+      <ReactCardFlip isFlipped={isFlipped} flipDirection="vertical ">
+        <div
+          onClick={handleClick}
+          className="px-10 py-6 bg-primaryShade3 w-4/6 text-center text-lg rounded-lg  "
+        >
+          {text}
+        </div>
+
+        <div
+          onClick={handleClick}
+          className="px-10 py-6 bg-primaryShade1 w-4/6  text-lg rounded-lg "
+        >
+          {backText}
+        </div>
+      </ReactCardFlip>
     </div>
   );
 }

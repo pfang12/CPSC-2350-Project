@@ -49,12 +49,19 @@ module.exports = {
         "2xl": "1536px",
       },
       // all the shades and fonts are here
-      //  shades- #9b77c1,#a686c8, #bca4d6, #c8b4dd,#d3c3e3,#ded2ea
+      //  shades- #9b77c1,#a686c8, #bca4d6, #c8b4dd,#d3c3e3,#ded2ea,#e9e1f1
       // tints-#825ea7,#735395,#654982,#563e70,#3a2a4a,#1d1525
 
       colors: {
         font: "#262731",
+        fontShade1: "#51525a",
         primary: "#9068ba",
+        primaryShade1: "#a686c8",
+        primaryShade2: "#c8b4dd",
+        primaryShade3: "#ded2ea",
+        primaryShade4: "#e9e1f1",
+
+        primaryTint1: "#3a2a4a",
       },
     },
   },

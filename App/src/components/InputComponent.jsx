@@ -1,23 +1,19 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useRef } from "react";
 import { gptRequest } from "../api/gptapi";
 import { extractText } from "../api/pdfapi";
 import { QuizContext } from "../context/QuizContext";
-
-// bootstrap
-import Button from "react-bootstrap/esm/Button";
-import Form from "react-bootstrap/Form";
-//
 
 import { useNavigate } from "react-router-dom";
 
 function InputComponent() {
   const { quiz, setQuiz } = useContext(QuizContext);
   const navigate = useNavigate();
-  const [fileState, setFileState] = useState("text");
+  const [fileState, setFileState] = useState("");
   const [numberQuestions, setNumberQuestions] = useState("5");
   const [questionType, setQuestionType] = useState("multiple choice");
   const [gptInput, setGptInput] = useState("");
   const [checkbox, setCheckbox] = useState(false);
+  const fileInputRef = useRef(null);
 
   function changeState(val) {
     setFileState(val);
@@ -41,10 +37,12 @@ function InputComponent() {
     console.log(jres.questions);
     setQuiz(jres.questions);
   };
-  function gettingFileValue(e) {
-    console.log(e.target.files[0]);
+  function gettingFileValue() {
+    const fileValue = fileInputRef.current.files[0];
+    console.log(fileValue);
     const extract = async () => {
-      const res = await extractText(e.target.files[0]);
+      setGptInput("loading....");
+      const res = await extractText(fileValue);
       setGptInput(res);
     };
     extract();
@@ -68,87 +66,112 @@ function InputComponent() {
   }
 
   return (
-    <div className="p-4">
+    <div className="px-6 py-10 mt-8 flex flex-col">
       {/* buttons */}
-      <div className="mb-4">
-        <Button
-          variant="outline-primary"
+      <div className="mb-12 flex gap-2">
+        <button
           onClick={() => changeState("text")}
-          className="me-2"
+          className={`text-lg cursor-pointer  text-font font-semibold py-2 px-4  bg-primary transition duration-300 ease-in-out hover:bg-primaryShade1 rounded-md ${
+            fileState == "text" && "bg-primaryShade2"
+          }`}
         >
           text
-        </Button>
-        <Button variant="outline-primary" onClick={() => changeState("file")}>
+        </button>
+
+        <button
+          onClick={() => changeState("file")}
+          className={`text-lg cursor-pointer  text-font font-semibold py-2 px-4  bg-primary transition duration-300 ease-in-out hover:bg-primaryShade1 rounded-md ${
+            fileState == "file" && "bg-primaryShade2"
+          }`}
+        >
           File
-        </Button>
+        </button>
       </div>
       {/* Input field */}
+
       <div>
-        <Form>
-          {fileState == "text" ? (
-            <Form.Group
-              className="mb-3 "
-              controlId="exampleForm.ControlTextarea1"
-            >
-              <Form.Control
-                as="textarea"
-                rows={7}
-                placeholder="Enter the Text"
-                onChange={changeGptInput}
-              />
-            </Form.Group>
-          ) : (
-            <Form.Group controlId="formFile" className="mb-3">
-              <Form.Control
+        {fileState == "file" && (
+          <div className="flex items-center gap-5 mb-8 ml-5">
+            <div>
+              <input
                 type="file"
-                accept=".txt, .docx, .doc, .pdf"
-                onChange={(e) => gettingFileValue(e)}
+                accept=".pdf"
+                ref={fileInputRef}
+                className="file:bg-gradient-to-b font-garamound file:from-primary file:to-primaryShade2 file:px-6 file:py-3 file:border-none file:rounded-full file:text-font file:cursor-pointer cursor-pointer "
               />
-            </Form.Group>
-          )}
-          <div className="d-flex justify-content-between">
-            <Form.Select className="w-25" onChange={numQuestion}>
-              <option>Number of Questions</option>
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="20">20</option>
-            </Form.Select>
-            <Form.Select className="w-25" onChange={typeQuestion}>
-              <option>Type</option>
-              <option value="multiple choice">Multi-choice Questions</option>
-              <option value="true or false">True/False</option>
-            </Form.Select>
-            <Button
-              variant="outline-primary"
-              onClick={() => getQuiz()}
-              disabled={!gptInput}
+            </div>
+
+            <button
+              className="text-md cursor-pointer  text-fontShade1 font-semibold py-2 px-4  bg-primaryShade2 transition duration-300 ease-in-out hover:bg-primaryShade3 rounded-md "
+              onClick={gettingFileValue}
             >
-              Submit
-            </Button>
+              Generate Text
+            </button>
           </div>
-        </Form>
+        )}
+
+        <textarea
+          id="message"
+          placeholder="either enter text or generate from file"
+          name="message"
+          rows="10"
+          required
+          value={gptInput}
+          className=" rounded-lg mx-5 my-10  w-4/5 bg-primaryShade3 text-font border-none text-md font-garamound"
+          onChange={changeGptInput}
+        ></textarea>
+        <div className="flex items-center justify-between mx-5 mb-20 ">
+          <select
+            className="w-52 origin-bottom py-2 px-2 bg-primaryShade2 border-none text-font rounded-lg"
+            onChange={numQuestion}
+          >
+            <option>Number of Questions: {numberQuestions}</option>
+            <option value="5">Number of Questions: 5</option>
+            <option value="10">Number of Questions: 10</option>
+            <option value="20">Number of Questions: 20</option>
+          </select>
+          <select
+            className="w-52 py-2 px-2 origin-bottom bg-primaryShade2 border-none text-font rounded-lg"
+            onChange={typeQuestion}
+          >
+            <option>Type :{questionType}</option>
+            <option value="multiple choice">Type: multiple-choice </option>
+            <option value="true/false">Type: True/False</option>
+          </select>
+          <button
+            onClick={() => getQuiz()}
+            disabled={!gptInput}
+            className="text-md cursor-pointer  text-fontShade1 font-semibold py-2 px-4  bg-primaryShade2 transition duration-300 ease-in-out hover:bg-primaryShade3 rounded-md "
+          >
+            Submit
+          </button>
+        </div>
       </div>
       {quiz.length == 0 ? (
-        <div>Ready to take quiz</div>
+        <div></div>
       ) : quiz[0] != "loading" ? (
-        <div>
-          <Button variant="outline-primary" onClick={() => attemptQuiz()}>
+        <div className="flex gap-5 items-center">
+          <button
+            onClick={() => attemptQuiz()}
+            className="text-md cursor-pointer  text-fontShade1 font-semibold py-2 px-4  bg-primaryShade2 transition duration-300 ease-in-out hover:bg-primaryShade3 rounded-md "
+          >
             take Quiz
-          </Button>
-          <Button variant="outline-primary" onClick={() => downloadPdf()}>
+          </button>
+          <button
+            onClick={() => downloadPdf()}
+            className="text-md cursor-pointer  text-fontShade1 font-semibold py-2 px-4 ml-4 bg-primaryShade2 transition duration-300 ease-in-out hover:bg-primaryShade3 rounded-md "
+          >
             Download the pdf file
-          </Button>
-          <Form.Check
-            inline
-            label="With Answers"
-            name="group1"
+          </button>
+          <input
             type="checkbox"
             id="checkboxPdfAnswer"
             onChange={() => setCheckbox(!checkbox)}
           />
+          <label htmlFor="checkboxPdfAnswer">With Answers</label>
         </div>
       ) : (
-        <p>...loading</p>
+        <p className="text-2xl">...loading</p>
       )}
     </div>
   );
