@@ -1,4 +1,3 @@
-import Button from "react-bootstrap/esm/Button";
 import { useContext, useState, useEffect } from "react";
 import { QuizContext } from "../context/QuizContext";
 
