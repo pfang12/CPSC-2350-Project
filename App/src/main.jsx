@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import QuizContextProvider from "./context/QuizContext.jsx";
+import "./index.css";
 
 //removable code
 import "./styles/global.css";

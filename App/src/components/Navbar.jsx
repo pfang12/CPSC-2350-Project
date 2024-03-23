@@ -1,13 +1,14 @@
 import React from "react";
-import logo from './images/brand.png'; 
+import logo from "./images/logo.png";
 
 function Navbar() {
   return (
-    <nav className="navbar">
-      <img src={logo} alt="Logo" style={{ width: '300px', height: '100px' }} className="navbar-logo" />
+    <nav className="">
+      <div className="">
+        <img src={logo} alt="logo" className="w-20 " />
+      </div>
     </nav>
   );
 }
 
 export default Navbar;
-
