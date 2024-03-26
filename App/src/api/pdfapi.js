@@ -173,3 +173,50 @@ export const extractText = async (file) => {
         console.log("Something went wrong uploading the file.");
     }
 };
+
+const quizDataBuilder = (quiz) => {
+    
+    const convertOptionsToObject = (options) =>{
+        const optionsObject = {}
+
+        options.forEach((option, index) => {
+            optionsObject[String.fromCharCode(97 + index)] = option;
+        });
+
+        return optionsObject;
+    }
+    
+    const quizData = {
+        "questions": quiz.map(question => ({
+            ...question,
+            "options": convertOptionsToObject(question.options)
+        }))
+    }
+
+    return quizData; 
+}
+
+const retrieveDocxTemplate = async (template) => {
+    try {
+        const file = await fetch(template);
+        const fileBlob = await file.blob();
+        
+        return fileBlob;
+    } catch(error){
+        console.log("Error: ", error);
+    }
+}
+
+// quiz download function
+export const downloadQuiz = async (quiz, template) => {
+
+    //const token = await generateAccessToken();
+
+    //const {uploadUri, assetID} = await generatePresignedURI(token);
+
+    const data = quizDataBuilder(quiz); 
+    
+    const templateDoc = await retrieveDocxTemplate(template);
+    
+    console.log(templateDoc);
+}

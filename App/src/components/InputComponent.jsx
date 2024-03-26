@@ -1,6 +1,6 @@
 import { useContext, useState, useRef } from "react";
 import { gptRequest } from "../api/gptapi";
-import { extractText } from "../api/pdfapi";
+import { extractText, downloadQuiz } from "../api/pdfapi";
 import { QuizContext } from "../context/QuizContext";
 
 import { useNavigate } from "react-router-dom";
@@ -58,11 +58,17 @@ function InputComponent() {
   }
   //download function
   function downloadPdf() {
-    if (checkbox) {
+
+    const download = async () =>{
+      await downloadQuiz(quiz, "/templates/quiz-wa.docx");
+    } 
+
+    download();
+    /*if (checkbox) {
       //for the answer key
     } else {
       //without the answer key
-    }
+    }*/
   }
 
   return (
