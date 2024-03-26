@@ -30,13 +30,16 @@ const generateAccessToken = async () => {
 };
 
 // generate presignedURI to upload files and assetID to locate files 
-const generatePresignedURI = async (token) => {
+const generatePresignedURI = async (token, type) => {
     console.log("generating presigned URI...");
 
+    const mediaType = type === "pdf" ? "application/pdf" : 
+"application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    
     const apiURL = "https://pdf-services-ue1.adobe.io/assets";
 
     const data = {
-        "mediaType": "application/pdf"
+        "mediaType": mediaType
     }
 
     try{
@@ -55,13 +58,15 @@ const generatePresignedURI = async (token) => {
 }
 
 // upload file to presignedURI
-const uploadFile = async (file, uploadURI) => {
+const uploadFile = async (file, uploadURI, type) => {
     console.log("uploading to presigned URI...");
 
+    const contentType = type === "pdf" ? "application/pdf" : 
+"application/vnd.openxmlformats-officedocument.wordprocessingml.document"    
     try{
         const response = await axios.put(uploadURI, file, {
             headers: {
-                "Content-Type": "application/pdf"
+                "Content-Type": contentType
             }
         });
 
@@ -159,9 +164,9 @@ const downloadData = async(downloadURI) => {
 export const extractText = async (file) => {
     const token = await generateAccessToken();
 
-    const {uploadUri, assetID} = await generatePresignedURI(token);
+    const {uploadUri, assetID} = await generatePresignedURI(token, "pdf");
 
-    const uploadSuccessful = await uploadFile(file, uploadUri);
+    const uploadSuccessful = await uploadFile(file, uploadUri, "pdf");
 
     if(uploadSuccessful === 200){
         const downloadUri = await startExtractJob(token, assetID);
@@ -196,13 +201,79 @@ const quizDataBuilder = (quiz) => {
     return quizData; 
 }
 
+// SOMETHING IS WRONG HERE!!!
 const retrieveDocxTemplate = async (template) => {
+    console.log("Retrieving doc template!")
     try {
         const file = await fetch(template);
-        const fileBlob = await file.blob();
+
+        const arrayBuffer = await file.arrayBuffer();
         
-        return fileBlob;
+        const docxTemplate = new Blob([new Uint8Array(arrayBuffer)], {type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"})
+
+        const downloadLink = document.createElement("a");
+        downloadLink.href = URL.createObjectURL(docxTemplate);
+        downloadLink.download = "quiz-wa.docx";
+
+        document.body.appendChild(downloadLink);
+
+        downloadLink.click();
+
+        document.body.removeChild(downloadLink);
+        
     } catch(error){
+        console.log("Error: ", error);
+    }
+}
+
+// extracts text and generates compressed JSON file 
+const startDocGeneration = async(token, assetID, jsonData) => {
+    console.log("Merging data with quiz template...");
+
+    const apiURL = "https://pdf-services-ue1.adobe.io/operation/documentgeneration";
+
+    const data = {
+        assetID: assetID,
+        outputFormat: "pdf",
+        jsonDataForMerge: jsonData
+    };
+
+    try {
+        // starts the extraction job on Adobe's servers
+        const response = await axios.post(apiURL, data, {
+            headers: {
+                Authorization: token,
+                "x-api-key": clientID,
+                "Content-Type": "application/json",
+            },
+        });
+
+        console.log("polling for job completion...");
+        let jobStatus;
+        let result;
+        do {
+            // checks for poll completion status
+            result = await axios.get(response.headers.location, {
+                headers: {
+                    Authorization: token,
+                    "x-api-key": clientID,
+                },
+            });
+
+            jobStatus = result.data.status;
+            console.log("Current job status: ", jobStatus);
+
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+        } while (jobStatus !== "done" && jobStatus !== "failed");
+
+        if (jobStatus === "done") {
+            return result.data.resource.downloadUri;
+        } else if (jobStatus === "failed") {
+            console.log("Document generation failed :(");
+            console.log("Code: ", result.data.error.code);
+            console.log("Message: ", result.data.error.message);
+        }
+    } catch (error) {
         console.log("Error: ", error);
     }
 }
@@ -210,13 +281,17 @@ const retrieveDocxTemplate = async (template) => {
 // quiz download function
 export const downloadQuiz = async (quiz, template) => {
 
-    //const token = await generateAccessToken();
-
-    //const {uploadUri, assetID} = await generatePresignedURI(token);
-
     const data = quizDataBuilder(quiz); 
     
     const templateDoc = await retrieveDocxTemplate(template);
     
-    console.log(templateDoc);
+    //const token = await generateAccessToken();
+
+    //const {uploadUri, assetID} = await generatePresignedURI(token, "docx");
+
+    //const uploadSuccessful = await uploadFile(templateDoc, uploadUri, "docx");
+
+    //if(uploadSuccessful === 200){
+    //    await startDocGeneration(token, assetID, data);        
+    //}
 }

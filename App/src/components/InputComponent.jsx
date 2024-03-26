@@ -60,7 +60,7 @@ function InputComponent() {
   function downloadPdf() {
 
     const download = async () =>{
-      await downloadQuiz(quiz, "/templates/quiz-wa.docx");
+      await downloadQuiz(quiz, "../templates/quiz-wa-template.docx");
     } 
 
     download();
