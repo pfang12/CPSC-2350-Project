@@ -5,6 +5,11 @@
 
 @layer base {
     html {
-        @apply bg-primaryShade4
+        @apply bg-magnolia
     }
+}
+
+input[type=file]::-webkit-file-upload-button,
+input[type=file]::file-selector-button {
+    @apply text-seasalt bg-amethyst rounded-md py-1 border-none text-button w-150 font-oswald cursor-pointer;
 }

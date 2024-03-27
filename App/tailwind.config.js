@@ -4,15 +4,19 @@ module.exports = {
     extend: {
       fontFamily: {
         garamound: ["EB Garamond", "serif"],
+        garamond: ["EB Garamond", "serif"],
         oswald: ["Oswald", "sans-serif"],
       },
 
       width: {
+        70: "70px",
+        100: "100px",
         150: "150px",
         190: "190px",
         225: "225px",
         275: "275px",
         300: "300px",
+        320: "320px",
         340: "340px",
         350: "350px",
         375: "375px",
@@ -62,8 +66,34 @@ module.exports = {
         primaryShade4: "#e9e1f1",
 
         primaryTint1: "#3a2a4a",
+
+        
+        dPurple: "#1D1525",
+        amethyst: "#9068BA",
+        thistle: "#C8B4DD",
+        magnolia: "#F5F1F9",
+        seasalt: "#F9F9F9",
+
+        iqRed: "#ED553B",
+        iqRedHalf: "#F59E8F",
+        iqYellow: "#F6B023",
+        iqYellowHalf: "#FAD589",
+        iqGreen: "#3CA277",
+        iqGreenHalf: "#97D8BD",
+        iqBlue: "#20639B",
+        iqBlueHalf: "#99C6EA"      
       },
+      fontSize: {
+        header: ["2rem"],
+        button: ["1.5rem"],
+        body: ["1rem"]
+      },
+      borderWidth: {
+        3: "3px"
+      }
     },
   },
-  plugins: [],
+  plugins: [
+    require("tailwindcss-inner-border")
+  ],
 };
