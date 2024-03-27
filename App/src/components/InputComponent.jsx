@@ -1,6 +1,6 @@
 import { useContext, useState, useRef } from "react";
 import { gptRequest } from "../api/gptapi";
-import { extractText } from "../api/pdfapi";
+import { extractText, downloadQuiz } from "../api/pdfapi";
 import { QuizContext } from "../context/QuizContext";
 
 import { useNavigate } from "react-router-dom";
@@ -58,24 +58,30 @@ function InputComponent() {
   }
   //download function
   function downloadPdf() {
-    if (checkbox) {
+
+    const download = async () =>{
+      await downloadQuiz(quiz, "/templates/quiz-wa-template.docx");
+    } 
+
+    download();
+    /*if (checkbox) {
       //for the answer key
     } else {
       //without the answer key
-    }
+    }*/
   }
 
   return (
     <div className="px-6 py-10 mt-8 flex flex-col">
       {/* buttons */}
-      <div className="mb-12 flex gap-2">
+      <div className="mb-12 flex gap-4">
         <button
           onClick={() => changeState("text")}
-          className={`text-lg cursor-pointer  text-font font-semibold py-2 px-4  bg-primary transition duration-300 ease-in-out hover:bg-primaryShade1 rounded-md ${
-            fileState == "text" && "bg-primaryShade2"
-          }`}
+          className={`text-lg cursor-pointer px-10 py-1 bg-primary drop-shadow-2xl transition duration-200 outline outline-primary outline-4  ease-in-out hover:bg-primaryShade3 hover:outline-primaryShade3 hover:text-font rounded-md ${
+                        fileState == "text" ? " bg-primaryShade4 text-font " : "text-white"
+                        }`}
         >
-          text
+          Text
         </button>
 
         <button
