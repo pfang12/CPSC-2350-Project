@@ -8,17 +8,16 @@ import { useNavigate } from "react-router-dom";
 function InputComponent() {
   const { quiz, setQuiz } = useContext(QuizContext);
   const navigate = useNavigate();
-  const [fileState, setFileState] = useState("text");
+  const [fileState, setFileState] = useState("");
   const [numberQuestions, setNumberQuestions] = useState("5");
   const [questionType, setQuestionType] = useState("multiple choice");
   const [gptInput, setGptInput] = useState("");
   const [checkbox, setCheckbox] = useState(false);
-  const [fileInputRef, setInputRef] = useState(null);
+  const fileInputRef = useRef(null);
 
   function changeState(val) {
     setFileState(val);
   }
-  console.log(fileInputRef);
 
   function numQuestion(e) {
     setNumberQuestions(e.target.value);
@@ -59,9 +58,10 @@ function InputComponent() {
   }
   //download function
   function downloadPdf() {
-    const download = async () => {
-      await downloadQuiz(quiz, "/templates/quiz-wa.docx");
-    };
+
+    const download = async () =>{
+      await downloadQuiz(quiz, "/templates/quiz-wa-template.docx");
+    } 
 
     download();
     /*if (checkbox) {
@@ -72,23 +72,22 @@ function InputComponent() {
   }
 
   return (
-    <div className=" py-8 flex flex-col">
-      <h1 className=" text-2xl mb-6">Enter your Text</h1>
+    <div className="px-6 py-10 mt-8 flex flex-col">
       {/* buttons */}
       <div className="mb-12 flex gap-4">
         <button
           onClick={() => changeState("text")}
           className={`text-lg cursor-pointer px-10 py-1 bg-primary drop-shadow-2xl transition duration-200 outline outline-primary outline-4  ease-in-out hover:bg-primaryShade3 hover:outline-primaryShade3 hover:text-font rounded-md ${
-            fileState == "text" ? " bg-primaryShade4 text-font " : "text-white"
-          }`}
+                        fileState == "text" ? " bg-primaryShade4 text-font " : "text-white"
+                        }`}
         >
           Text
         </button>
 
         <button
           onClick={() => changeState("file")}
-          className={`text-lg cursor-pointer   px-10 py-1 bg-primary transition duration-200 outline outline-primary outline-4  ease-in-out hover:bg-primaryShade3 hover:outline-primaryShade3 hover:text-font rounded-md ${
-            fileState == "file" ? "bg-primaryShade4 text-font " : "text-white"
+          className={`text-lg cursor-pointer  text-font font-semibold py-2 px-4  bg-primary transition duration-300 ease-in-out hover:bg-primaryShade1 rounded-md ${
+            fileState == "file" && "bg-primaryShade2"
           }`}
         >
           File
@@ -98,25 +97,22 @@ function InputComponent() {
 
       <div>
         {fileState == "file" && (
-          <div className="flex items-center gap-5 mb-8">
+          <div className="flex items-center gap-5 mb-8 ml-5">
             <div>
               <input
                 type="file"
                 accept=".pdf"
                 ref={fileInputRef}
-                onChange={(e) => setInputRef(e.target.files[0])}
-                className=" font-garamound file:font-oswald file:text-lg file:bg-primary file:hover:bg-primaryShade3 file:hover:text-font file:text-white rounded-md file:px-10 file:py-2 w-96 file:rounded-md file:border-none bg-white text-font file:cursor-pointer cursor-pointer "
+                className="file:bg-gradient-to-b font-garamound file:from-primary file:to-primaryShade2 file:px-6 file:py-3 file:border-none file:rounded-full file:text-font file:cursor-pointer cursor-pointer "
               />
             </div>
 
-            {fileInputRef && (
-              <button
-                className="text-md cursor-pointer  text-white  py-2 px-4  bg-primary transition duration-300 ease-in-out hover:bg-primaryShade3 hover:text-font rounded-md "
-                onClick={gettingFileValue}
-              >
-                Generate Text
-              </button>
-            )}
+            <button
+              className="text-md cursor-pointer  text-fontShade1 font-semibold py-2 px-4  bg-primaryShade2 transition duration-300 ease-in-out hover:bg-primaryShade3 rounded-md "
+              onClick={gettingFileValue}
+            >
+              Generate Text
+            </button>
           </div>
         )}
 

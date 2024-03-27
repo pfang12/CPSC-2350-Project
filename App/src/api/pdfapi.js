@@ -201,7 +201,7 @@ const quizDataBuilder = (quiz) => {
     return quizData; 
 }
 
-// SOMETHING IS WRONG HERE!!!
+// retrieve docx template from public folder
 const retrieveDocxTemplate = async (template) => {
     console.log("Retrieving doc template!")
     try {
@@ -210,17 +210,8 @@ const retrieveDocxTemplate = async (template) => {
         const arrayBuffer = await file.arrayBuffer();
         
         const docxTemplate = new Blob([new Uint8Array(arrayBuffer)], {type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"})
-
-        const downloadLink = document.createElement("a");
-        downloadLink.href = URL.createObjectURL(docxTemplate);
-        downloadLink.download = "quiz-wa.docx";
-
-        document.body.appendChild(downloadLink);
-
-        downloadLink.click();
-
-        document.body.removeChild(downloadLink);
         
+        return docxTemplate;
     } catch(error){
         console.log("Error: ", error);
     }
@@ -267,13 +258,36 @@ const startDocGeneration = async(token, assetID, jsonData) => {
         } while (jobStatus !== "done" && jobStatus !== "failed");
 
         if (jobStatus === "done") {
-            return result.data.resource.downloadUri;
+            return result.data.asset.downloadUri;
         } else if (jobStatus === "failed") {
             console.log("Document generation failed :(");
             console.log("Code: ", result.data.error.code);
             console.log("Message: ", result.data.error.message);
         }
     } catch (error) {
+        console.log("Error: ", error);
+    }
+}
+
+const downloadPDF = async (downloadURI) => {
+    try{
+        const response = await axios.get(downloadURI, {
+            responseType: "blob"
+        });
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "quiz.pdf");
+
+        document.body.appendChild(link);
+        link.click();
+
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
+    } catch(error){
         console.log("Error: ", error);
     }
 }
@@ -285,13 +299,16 @@ export const downloadQuiz = async (quiz, template) => {
     
     const templateDoc = await retrieveDocxTemplate(template);
     
-    //const token = await generateAccessToken();
+    const token = await generateAccessToken();
 
-    //const {uploadUri, assetID} = await generatePresignedURI(token, "docx");
+    const {uploadUri, assetID} = await generatePresignedURI(token, "docx");
 
-    //const uploadSuccessful = await uploadFile(templateDoc, uploadUri, "docx");
+    const uploadSuccessful = await uploadFile(templateDoc, uploadUri, "docx");
 
-    //if(uploadSuccessful === 200){
-    //    await startDocGeneration(token, assetID, data);        
-    //}
+    if(uploadSuccessful === 200){
+        const downloadUri = await startDocGeneration(token, assetID, data);
+
+        await downloadPDF(downloadUri);            
+        //console.log(downloadUri);       
+    }
 }

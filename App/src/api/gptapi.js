@@ -17,7 +17,7 @@ export const gptRequest = async (numberQuestions, questionType, gptInput) => {
   const prompt = generatePrompt(numberQuestions, questionType, gptInput);
 
   const data = {
-    model: "gpt-4",
+    model: "gpt-3.5-turbo",
     messages: [{ role: "user", content: prompt }],
   };
 
