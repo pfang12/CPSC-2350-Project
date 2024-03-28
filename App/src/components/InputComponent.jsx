@@ -1,5 +1,5 @@
 import { useContext, useState, useRef } from "react";
-import { gptRequest } from "../api/gptapi";
+import { quizRequest } from "../api/gptapi";
 import { extractText, downloadQuiz } from "../api/pdfapi";
 import { QuizContext } from "../context/QuizContext";
 import Divider from "../components/Divider";
