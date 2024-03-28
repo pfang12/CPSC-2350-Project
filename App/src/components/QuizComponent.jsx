@@ -108,7 +108,7 @@ function QuizComponent() {
             <button
               type="button"
               onClick={submit}
-              className="text-seasalt bg-iqRed text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-iqRedHalf hover:text-dPurple"
+              className="text-seasalt bg-iqRed text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-iqLightRed hover:text-dPurple"
             >
               Submit
             </button>
@@ -119,7 +119,7 @@ function QuizComponent() {
               <button
                 type="button"
                 onClick={submitAnyways}
-                className="text-seasalt bg-iqRed text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-iqRedHalf hover:text-dPurple"
+                className="text-seasalt bg-iqRed text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-iqLightRed hover:text-dPurple"
               >
                 Submit Anyways
               </button>

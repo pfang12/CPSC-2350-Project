@@ -161,7 +161,7 @@ function InputComponent() {
             <h1 className="text-header text-dPurple mb-5">Your Quiz Is Ready!</h1>
             <button
               onClick={() => attemptQuiz()}
-              className="text-seasalt bg-iqRed text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-iqRedHalf hover:text-dPurple mb-5"
+              className="text-seasalt bg-iqRed text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-iqLightRed hover:text-dPurple mb-5"
             >
               Take Quiz
             </button><br />

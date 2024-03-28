@@ -67,9 +67,9 @@ export const DisplayQuiz = ({ data, index }) => {
                         key={`default-${value}`}
                         className={`mb-2 flex items-center gap-2 rounded-md p-2 inner-border-3 ${
                             value == data.answer
-                                ? "bg-iqGreenHalf inner-border-iqGreen"
+                                ? "bg-iqLightGreen inner-border-iqGreen"
                                 : value == data.userResponse 
-                                ? "bg-iqRedHalf inner-border-iqRed"
+                                ? "bg-iqLightRed inner-border-iqRed"
                                 : "bg-seasalt inner-border-thistle"
                         }`}
                     >

@@ -15,8 +15,8 @@ export default function AttemptingPart({ question, passValue, index }) {
     passValue(option);
   };
 
-  const colors = ["iqGreenHalf", "iqRedHalf", "iqYellowHalf", "iqBlueHalf"];
-  const selectedColors = ["iqGreen", "iqRed", "iqYellow", "iqBlue"];
+  const colors = ["bg-iqLightGreen", "bg-iqLightRed", "bg-iqLightYellow", "bg-iqLightBlue"];
+  const selectedColors = ["bg-iqGreen", "bg-iqRed", "bg-iqYellow", "bg-iqBlue"];
 
   // option == selectedValue ? full color : normal color
   
@@ -29,7 +29,7 @@ export default function AttemptingPart({ question, passValue, index }) {
         {question.options.map((option, idx) => (
           <div
             key={idx}
-            className={`text-center text-button py-10 w-full justify-start cursor-pointer rounded-lg drop-shadow-lg bg-${option == selectedValue ? selectedColors[idx] : colors[idx]} ${option == selectedValue ? "text-seasalt inner-border-4 inner-border-amethyst" : "text-dPurple"}`}
+            className={`text-center text-button py-10 w-full justify-start cursor-pointer rounded-lg drop-shadow-lg ${option == selectedValue ? `inner-border-3 inner-border-amethyst text-seasalt ${selectedColors[idx]}` : colors[idx]}`}
             onClick={() => handleOptionSelect(option)}
           >
             {option}
