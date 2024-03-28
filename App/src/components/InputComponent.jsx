@@ -3,6 +3,7 @@ import { gptRequest } from "../api/gptapi";
 import { extractText, downloadQuiz } from "../api/pdfapi";
 import { QuizContext } from "../context/QuizContext";
 import Divider from "../components/Divider";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 import { useNavigate } from "react-router-dom";
 
@@ -174,11 +175,15 @@ function InputComponent() {
               type="checkbox"
               id="checkboxPdfAnswer"
               onChange={() => setCheckbox(!checkbox)}
+              className="w-8"
             />
-          <label htmlFor="checkboxPdfAnswer">Include answers</label>
+          <label htmlFor="checkboxPdfAnswer" className="text-body text-dPurple">Include answers</label>
           </div>
           ) : (
-            <p className="">...loading</p>
+            <div>
+                <h1 className="text-header text-dPurple mb-5">Loading...</h1>
+                <LoadingSpinner />
+            </div>
           )}        
           </div>
         </div>

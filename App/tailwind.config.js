@@ -64,16 +64,12 @@ module.exports = {
         primaryShade2: "#c8b4dd",
         primaryShade3: "#ded2ea",
         primaryShade4: "#e9e1f1",
-
         primaryTint1: "#3a2a4a",
-
-        
         dPurple: "#1D1525",
         amethyst: "#9068BA",
         thistle: "#C8B4DD",
         magnolia: "#F5F1F9",
         seasalt: "#F9F9F9",
-
         iqRed: "#ED553B",
         iqRedHalf: "#F59E8F",
         iqYellow: "#F6B023",

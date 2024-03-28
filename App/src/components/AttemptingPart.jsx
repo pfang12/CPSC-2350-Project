@@ -15,29 +15,32 @@ export default function AttemptingPart({ question, passValue, index }) {
     passValue(option);
   };
 
+  const colors = ["iqGreenHalf", "iqRedHalf", "iqYellowHalf", "iqBlueHalf"];
+  const selectedColors = ["iqGreen", "iqRed", "iqYellow", "iqBlue"];
+
+  // option == selectedValue ? full color : normal color
+  
   return (
-    <div>
-      <h1 className="text-2xl text-font">
+    <div className="w-full">
+      <h1 className="text-header text-dPurple mb-3">
         {index + 1}. {question.question}
       </h1>
-      <div className="flex flex-col  gap-3 py-4 px-10 mb-6">
+      <div className="grid grid-cols-2 gap-4 w-full">
         {question.options.map((option, idx) => (
-          <p
+          <div
             key={idx}
-            className={` px-2 py-2 w-4/6 justify-start cursor-pointer border border-gray-300 rounded-lg ${
-              option == selectedValue ? "bg-primary" : "hover:bg-primaryShade3"
-            } `}
+            className={`text-center text-button py-10 w-full justify-start cursor-pointer rounded-lg drop-shadow-lg bg-${option == selectedValue ? selectedColors[idx] : colors[idx]} ${option == selectedValue ? "text-seasalt inner-border-4 inner-border-amethyst" : "text-dPurple"}`}
             onClick={() => handleOptionSelect(option)}
           >
-            {`${idx + 1}. ${option}`}
-          </p>
+            {option}
+          </div>
         ))}
       </div>
 
-      <div className="mb-8">
+      <div className="mb-10">
         <FlipCard
           key={`hint-${index}`} // Reset flip card when the question index changes
-          text="Hint?"
+          text="Click here for a hint!"
           backText={question.hint || "No hints available."}
         />
       </div>
@@ -54,18 +57,18 @@ function FlipCard({ text, backText }) {
   }
 
   return (
-    <div>
+    <div className="mt-10">
       <ReactCardFlip isFlipped={isFlipped} flipDirection="vertical ">
         <div
           onClick={handleClick}
-          className="px-10 py-6 bg-primaryShade3 w-4/6 text-center text-lg rounded-lg  "
+          className="py-10 bg-thistle w-full text-center text-button rounded-lg cursor-pointer"
         >
           {text}
         </div>
 
         <div
           onClick={handleClick}
-          className="px-10 py-6 bg-primaryShade1 w-4/6  text-lg rounded-lg "
+          className="py-10 bg-magnolia inner-border-3 inner-border-amethyst text-center w-full text-button font-garamond rounded-lg cursor-pointer"
         >
           {backText}
         </div>

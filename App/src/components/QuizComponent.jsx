@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect } from "react";
 import { QuizContext } from "../context/QuizContext";
-
+import Divider from "../components/Divider";
 import AttemptingPart from "./AttemptingPart";
 import { useNavigate } from "react-router-dom";
 
@@ -74,17 +74,19 @@ function QuizComponent() {
   return quiz.length == 0 || questionValue == null ? (
     <div>Something went wrong</div>
   ) : (
-    <div className="px-6 py-10">
+    <div className="col-span-12">
       <AttemptingPart
         question={questionValue}
         passValue={passValue}
         index={currentQuestionIndex}
       />
-      <div className="flex gap-4">
+      <Divider />
+      <div className="flex flex-col">
+        <div className="flex gap-4">
         {currentQuestionIndex > 0 && missing == -1 && (
           <button
             type="button"
-            className="text-md cursor-pointer  text-fontShade1 font-semibold py-2 px-4  bg-primaryShade2 transition duration-300 ease-in-out hover:bg-primaryShade3 rounded-md "
+            className="text-dPurple bg-magnolia inner-border-3 inner-border-amethyst text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple hover:inner-border-thistle"
             onClick={backPage}
           >
             Back
@@ -93,39 +95,42 @@ function QuizComponent() {
         {currentQuestionIndex < quizMaterial.length - 1 && (
           <button
             type="button"
-            className="text-md cursor-pointer  text-fontShade1 font-semibold py-2 px-4  bg-primaryShade2 transition duration-300 ease-in-out hover:bg-primaryShade3 rounded-md "
+            className="text-seasalt bg-amethyst text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple"
             onClick={nextPage}
           >
             Next
           </button>
         )}
-
+        </div>
+        <br />
         {quizMaterial.length - 1 == currentQuestionIndex &&
           (missing == -1 ? (
             <button
               type="button"
               onClick={submit}
-              className="text-md cursor-pointer  text-fontShade1 font-semibold py-2 px-4  bg-primaryShade2 transition duration-300 ease-in-out hover:bg-primaryShade3 rounded-md "
+              className="text-seasalt bg-iqRed text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-iqRedHalf hover:text-dPurple"
             >
               Submit
             </button>
           ) : (
-            <div className="flex gap-2">
-              <p className="">few question are still unanswered</p>
+            <div className="flex flex-col gap-2">
+              <p className="text-button text-dPurple">Looks like you missed a few questions!</p>
+              <div className="flex gap-4">
               <button
                 type="button"
                 onClick={submitAnyways}
-                className="text-md cursor-pointer  text-fontShade1 font-semibold py-2 px-4  bg-primaryShade2 transition duration-300 ease-in-out hover:bg-primaryShade3 rounded-md "
+                className="text-seasalt bg-iqRed text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-iqRedHalf hover:text-dPurple"
               >
                 Submit Anyways
               </button>
               <button
                 type="button"
                 onClick={goBack}
-                className="text-md cursor-pointer  text-fontShade1 font-semibold py-2 px-4  bg-primaryShade2 transition duration-300 ease-in-out hover:bg-primaryShade3 rounded-md "
+                className="text-seasalt bg-amethyst text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple"
               >
-                Attempt missing Answers
+                Back to Quiz
               </button>
+              </div>
             </div>
           ))}
       </div>
