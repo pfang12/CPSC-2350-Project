@@ -2,13 +2,15 @@ import { useContext, useState, useRef } from "react";
 import { gptRequest } from "../api/gptapi";
 import { extractText, downloadQuiz } from "../api/pdfapi";
 import { QuizContext } from "../context/QuizContext";
+import Divider from "../components/Divider";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 import { useNavigate } from "react-router-dom";
 
 function InputComponent() {
   const { quiz, setQuiz } = useContext(QuizContext);
   const navigate = useNavigate();
-  const [fileState, setFileState] = useState("");
+  const [fileState, setFileState] = useState("text");
   const [numberQuestions, setNumberQuestions] = useState("5");
   const [questionType, setQuestionType] = useState("multiple choice");
   const [gptInput, setGptInput] = useState("");
@@ -72,23 +74,19 @@ function InputComponent() {
   }
 
   return (
-    <div className="px-6 py-10 mt-8 flex flex-col">
-      {/* buttons */}
-      <div className="mb-12 flex gap-4">
+    <div className="col-span-12">
+      <h1 className="text-header text-dPurple mb-3">Enter Your Text</h1>
+      <div className="flex justify-between w-320">
         <button
           onClick={() => changeState("text")}
-          className={`text-lg cursor-pointer px-10 py-1 bg-primary drop-shadow-2xl transition duration-200 outline outline-primary outline-4  ease-in-out hover:bg-primaryShade3 hover:outline-primaryShade3 hover:text-font rounded-md ${
-                        fileState == "text" ? " bg-primaryShade4 text-font " : "text-white"
-                        }`}
+          className={`${fileState === "text" ? "inner-border-3 inner-border-amethyst text-dPurple bg-magnolia cursor-default" : "text-seasalt bg-amethyst hover:bg-thistle hover:text-dPurple"} text-center w-150 py-1 text-button rounded-md mb-5 drop-shadow-lg`}
         >
           Text
         </button>
 
         <button
           onClick={() => changeState("file")}
-          className={`text-lg cursor-pointer  text-font font-semibold py-2 px-4  bg-primary transition duration-300 ease-in-out hover:bg-primaryShade1 rounded-md ${
-            fileState == "file" && "bg-primaryShade2"
-          }`}
+          className={`${fileState === "file" ? "inner-border-3 inner-border-amethyst text-dPurple bg-magnolia cursor-default" : "text-seasalt bg-amethyst hover:bg-thistle hover:text-dPurple"} text-center w-150 py-1 text-button rounded-md mb-5 drop-shadow-lg`}
         >
           File
         </button>
@@ -97,88 +95,99 @@ function InputComponent() {
 
       <div>
         {fileState == "file" && (
-          <div className="flex items-center gap-5 mb-8 ml-5">
-            <div>
+          <div className="flex justify-between my-5 drop-shadow-md">
+            <div className="w-4/5 bg-seasalt rounded-md">
               <input
                 type="file"
                 accept=".pdf"
                 ref={fileInputRef}
-                className="file:bg-gradient-to-b font-garamound file:from-primary file:to-primaryShade2 file:px-6 file:py-3 file:border-none file:rounded-full file:text-font file:cursor-pointer cursor-pointer "
+                className="font-oswald text-dPurple text-button"
               />
             </div>
 
             <button
-              className="text-md cursor-pointer  text-fontShade1 font-semibold py-2 px-4  bg-primaryShade2 transition duration-300 ease-in-out hover:bg-primaryShade3 rounded-md "
+              className="text-seasalt bg-amethyst text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple"
               onClick={gettingFileValue}
             >
-              Generate Text
+              Extract Text
             </button>
           </div>
         )}
 
         <textarea
           id="message"
-          placeholder="either enter text or generate from file"
+          placeholder={`${fileState === "text" ? "Write your text here..." : "Your extracted text will appear here..."}`}
           name="message"
           rows="10"
+          disabled={fileState === "file"}
           required
           value={gptInput}
-          className=" rounded-lg mx-5 my-10  w-4/5 bg-primaryShade3 text-font border-none text-md font-garamound"
+          className="bg-seasalt font-garamond text-body text-dPurple w-full drop-shadow-md rounded-xl p-1 mb-10"
           onChange={changeGptInput}
         ></textarea>
-        <div className="flex items-center justify-between mx-5 mb-20 ">
-          <select
-            className="w-52 origin-bottom py-2 px-2 bg-primaryShade2 border-none text-font rounded-lg"
-            onChange={numQuestion}
-          >
-            <option>Number of Questions:</option>
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="20">20</option>
-          </select>
-          <select
-            className="w-52 py-2 px-2 origin-bottom bg-primaryShade2 border-none text-font rounded-lg"
-            onChange={typeQuestion}
-          >
-            <option>Type: </option>
-            <option value="multiple choice">multiple-choice </option>
-            <option value="true/false">True/False</option>
-          </select>
+        <Divider />
+        <div className="flex justify-between">
+        <div className="w-225 flex flex-col">
+          <h1 className="text-header text-dPurple mb-5">Question Options</h1>
+          <div className="flex justify-between mb-3">
+            <label htmlFor="numQuestions" className="text-button text-dPurple">Number:</label>
+            <input id="numQuestions" type="number" min="5" max="30" defaultValue="5" onChange={numQuestion} className="w-70 ml-5 pl-1 text-dPurple bg-seasalt drop-shadow-md rounded-md text-button "/>
+          </div>
+          <div className="flex justify-between mb-5">
+            <label htmlFor="typeQuestions" className="text-button text-dPurple">Type:</label>
+              <select
+              id="typeQuestions"
+              className="bg-seasalt drop-shadow-md rounded-md text-button pr-2 text-dPurple"
+              onChange={typeQuestion}
+            >
+              <option value="multiple choice">Multiple Choice </option>
+              <option value="true/false">True/False</option>
+            </select>           
+          </div>
           <button
             onClick={() => getQuiz()}
             disabled={!gptInput}
-            className="text-md cursor-pointer  text-fontShade1 font-semibold py-2 px-4  bg-primaryShade2 transition duration-300 ease-in-out hover:bg-primaryShade3 rounded-md "
+            className="text-seasalt bg-amethyst text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple"
           >
             Submit
           </button>
         </div>
-      </div>
-      {quiz.length == 0 ? (
-        <div></div>
-      ) : quiz[0] != "loading" ? (
-        <div className="flex gap-5 items-center">
-          <button
-            onClick={() => attemptQuiz()}
-            className="text-md cursor-pointer  text-fontShade1 font-semibold py-2 px-4  bg-primaryShade2 transition duration-300 ease-in-out hover:bg-primaryShade3 rounded-md "
-          >
-            take Quiz
-          </button>
-          <button
-            onClick={() => downloadPdf()}
-            className="text-md cursor-pointer  text-fontShade1 font-semibold py-2 px-4 ml-4 bg-primaryShade2 transition duration-300 ease-in-out hover:bg-primaryShade3 rounded-md "
-          >
-            Download the pdf file
-          </button>
-          <input
-            type="checkbox"
-            id="checkboxPdfAnswer"
-            onChange={() => setCheckbox(!checkbox)}
-          />
-          <label htmlFor="checkboxPdfAnswer">With Answers</label>
+        <div>
+            {/*First condition: quiz.length == 0 Second condition: quiz[0] != "loading" */}
+          {quiz.length == 0 ? (
+          <div></div>
+          ) : quiz[0] != "loading" ? (
+            <div className="">
+            <h1 className="text-header text-dPurple mb-5">Your Quiz Is Ready!</h1>
+            <button
+              onClick={() => attemptQuiz()}
+              className="text-seasalt bg-iqRed text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-iqLightRed hover:text-dPurple mb-5"
+            >
+              Take Quiz
+            </button><br />
+            <button
+              onClick={() => downloadPdf()}
+              className="text-seasalt bg-amethyst text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple mb-1"
+            >
+              Download PDF
+            </button><br />
+            <input
+              type="checkbox"
+              id="checkboxPdfAnswer"
+              onChange={() => setCheckbox(!checkbox)}
+              className="w-8"
+            />
+          <label htmlFor="checkboxPdfAnswer" className="text-body text-dPurple">Include answers</label>
+          </div>
+          ) : (
+            <div>
+                <h1 className="text-header text-dPurple mb-5">Loading...</h1>
+                <LoadingSpinner />
+            </div>
+          )}        
+          </div>
         </div>
-      ) : (
-        <p className="text-2xl">...loading</p>
-      )}
+      </div>
     </div>
   );
 }

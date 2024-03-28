@@ -2,6 +2,7 @@ import { useContext, useEffect } from "react";
 import { QuizContext } from "../context/QuizContext";
 
 import { useNavigate } from "react-router-dom";
+import Divider from "./Divider";
 function Result() {
     const { quiz } = useContext(QuizContext);
     const navigate = useNavigate();
@@ -23,62 +24,61 @@ function Result() {
     };
 
     return (
-        <div className="px-4 py-6">
-            <h1 className="text-xl text-font mb-6 p-4">
+        <div className="col-span-12">
+            <h1 className="text-4xl text-dPurple mb-6">
                 Your Score{" "}
-                <span className="text-primary">
+                <span className="text-amethyst">
                     {getScore()} / {quiz.length}
                 </span>
             </h1>
-            <div className="  px-4 py-2 border border-gray-300 rounded-lg bg-primaryShade4 mb-4">
+            <div className="flex gap-4 mb-10">
+                <button className="text-seasalt bg-amethyst text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple" onClick={homePage}>Home Page</button>
+                <button className="text-dPurple bg-magnolia inner-border-3 inner-border-amethyst text-center px-2 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple hover:inner-border-thistle">Download Report</button>
+            </div>
+            <Divider /> 
+            <div>
                 {quiz.map((data, i) => (
                     <DisplayQuiz data={data} key={i} index={i + 1} />
                 ))}
             </div>
-
+            <Divider />
+            <h1 className="text-header text-dPurple">Feedback</h1>
+            {/*The feedback text goes here*/}
             <button
                 type="button"
-                className="text-lg cursor-pointer  text-font font-semibold py-2 px-4  bg-primary transition duration-300 ease-in-out hover:bg-primaryShade1 rounded-md "
+                className="text-seasalt bg-amethyst text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple my-6 mr-4"
                 onClick={homePage}
             >
                 Home Page
             </button>
-        </div>
+            <button className="text-dPurple bg-magnolia inner-border-3 inner-border-amethyst text-center px-2 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple hover:inner-border-thistle">Download Report</button>
+            </div>
     );
 }
 export const DisplayQuiz = ({ data, index }) => {
     return (
-        <div className="mb-6">
+        <div className="mb-10">
             <div>
-                <p className="text-lg mb-3">{data.question}</p>
+                <p className="text-button text-dPurple mb-3">{index}. {data.question}</p>
             </div>
-            <div className="px-4">
+            <div>
                 {data.options.map((value, index) => (
                     <div
                         key={`default-${value}`}
-                        className={`mb-2 flex items-center gap-2 ${
+                        className={`mb-2 flex items-center gap-2 rounded-md p-2 inner-border-3 ${
                             value == data.answer
-                                ? "bg-green-500"
-                                : value == data.userResponse && "bg-red-500"
-                        } rounded-md p-2`}
+                                ? "bg-iqLightGreen inner-border-iqGreen"
+                                : value == data.userResponse 
+                                ? "bg-iqLightRed inner-border-iqRed"
+                                : "bg-seasalt inner-border-thistle"
+                        }`}
                     >
-                        {value == data.answer ? (
-                            <span className="rounded-lg bg-green-700">
-                                ✔️&nbsp;
-                            </span>
-                        ) : value == data.userResponse ? (
-                            <span className="rounded-lg bg-red-700">
-                                ❌&nbsp;
-                            </span>
-                        ) : (
-                            <p className="w-7">&nbsp;</p>
-                        )}
-
-                        <p>{`${index + 1}. ${value}`}</p>
+                
+                        <p className="text-body">{`${value}`}</p>
                     </div>
                 ))}
             </div>
-            <div className="px-4">
+            <div>
                 {data.options.map((value, index) => (
                     <div key={`explanation-${value}`}>
                         {value == data.answer && value == data.userResponse ? (
