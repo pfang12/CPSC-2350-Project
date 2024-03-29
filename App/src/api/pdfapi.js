@@ -310,6 +310,7 @@ export const downloadQuiz = async (quiz, template) => {
         const downloadUri = await startDocGeneration(token, assetID, data);
 
         await downloadPDF(downloadUri);            
-        //console.log(downloadUri);       
     }
+
+    return "done";
 }

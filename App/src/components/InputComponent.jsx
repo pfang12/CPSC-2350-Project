@@ -16,6 +16,7 @@ function InputComponent() {
   const [gptInput, setGptInput] = useState("");
   const [ansCheckbox, setAnsCheckbox] = useState(false);
   const [pwdCheckbox, setPwdCheckbox] = useState(false);
+  const [isDownloadLoading, setDownloadLoading] = useState(false);
   const fileInputRef = useRef(null);
 
   function changeState(val) {
@@ -61,19 +62,25 @@ function InputComponent() {
   }
   //download function
   function downloadPdf() {
+    setDownloadLoading(true);
     const download = async () =>{
+      let status = "in progress";
       if(ansCheckbox){
         if(questionType === "multiple choice"){
-          await downloadQuiz(quiz, "/templates/quiz-mcq-wa-template.docx");
+          status = await downloadQuiz(quiz, "/templates/quiz-mcq-wa-template.docx");
         } else if(questionType === "true/false"){
-          await downloadQuiz(quiz, "/templates/quiz-tf-wa-template.docx");
+          status = await downloadQuiz(quiz, "/templates/quiz-tf-wa-template.docx");
         }
       } else {
         if(questionType === "multiple choice"){
-          await downloadQuiz(quiz, "/templates/quiz-mcq-na-template.docx");  
+          status = await downloadQuiz(quiz, "/templates/quiz-mcq-na-template.docx");  
         } else if(questionType === "true/false"){
-          await downloadQuiz(quiz, "/templates/quiz-tf-na-template.docx");
+          status = await downloadQuiz(quiz, "/templates/quiz-tf-na-template.docx");
         }
+      }
+
+      if(status === "done"){
+        setDownloadLoading(false);
       }
     } 
 
@@ -163,7 +170,7 @@ function InputComponent() {
             {/*First condition: quiz.length == 0 Second condition: quiz[0] != "loading" */}
           {quiz.length == 0 ? (
           <div></div>
-          ) : quiz[0] != "loading" ? (
+          ) : (quiz[0] != "loading" && !isDownloadLoading) ? (
             <div className="">
             <h1 className="text-header text-dPurple mb-5">Your Quiz Is Ready!</h1>
             <button
