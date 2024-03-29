@@ -1,0 +1,33 @@
+@import url("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Oswald:wght@200..700&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html {
+        @apply bg-magnolia
+    }
+}
+
+input[type=file]::-webkit-file-upload-button,
+input[type=file]::file-selector-button {
+    @apply text-seasalt bg-amethyst rounded-md py-1 border-none text-button w-150 font-oswald cursor-pointer;
+}
+
+@keyframes fade-in-out {
+    0% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+.animate-fade-in-out {
+    animation: fade-in-out 2s ease-in-out infinite
+}

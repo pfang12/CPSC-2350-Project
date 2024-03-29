@@ -1,13 +1,16 @@
 import React from "react";
-import logo from './images/brand.png'; 
+import brand from "./images/brand.png";
 
 function Navbar() {
   return (
-    <nav className="navbar">
-      <img src={logo} alt="Logo" style={{ width: '300px', height: '100px' }} className="navbar-logo" />
-    </nav>
+      <div className="col-span-12">
+        <img
+          src={brand}
+          alt="Intelliquiz Logo"
+          className="w-300"
+        />
+      </div>
   );
 }
 
 export default Navbar;
-

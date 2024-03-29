@@ -1,11 +1,10 @@
-import { useContext, useState } from "react";
-import { gptRequest } from "../api/gptapi";
-import { extractText } from "../api/pdfapi";
+import { useContext, useState, useRef } from "react";
+import { quizRequest } from "../api/gptapi";
+import { extractText, downloadQuiz } from "../api/pdfapi";
 import { QuizContext } from "../context/QuizContext";
+import Divider from "../components/Divider";
+import LoadingSpinner from "../components/LoadingSpinner";
 
-// bootstrap
-import Button from "react-bootstrap/esm/Button";
-import Form from "react-bootstrap/Form";
 import { useNavigate } from "react-router-dom";
 
 function InputComponent() {
@@ -16,6 +15,7 @@ function InputComponent() {
   const [questionType, setQuestionType] = useState("multiple choice");
   const [gptInput, setGptInput] = useState("");
   const [checkbox, setCheckbox] = useState(false);
+  const fileInputRef = useRef(null);
 
   function changeState(val) {
     setFileState(val);
@@ -33,16 +33,18 @@ function InputComponent() {
   const gptCallResponse = async () => {
     setQuiz(["loading"]);
     console.log(gptInput);
-    const res = await gptRequest(numberQuestions, questionType, gptInput);
+    const res = await quizRequest(numberQuestions, questionType, gptInput);
     console.log(res);
     const jres = JSON.parse(res);
     console.log(jres.questions);
     setQuiz(jres.questions);
   };
-  function gettingFileValue(e) {
-    console.log(e.target.files[0]);
+  function gettingFileValue() {
+    const fileValue = fileInputRef.current.files[0];
+    console.log(fileValue);
     const extract = async () => {
-      const res = await extractText(e.target.files[0]);
+      setGptInput("loading....");
+      const res = await extractText(fileValue);
       setGptInput(res);
     };
     extract();
@@ -58,96 +60,134 @@ function InputComponent() {
   }
   //download function
   function downloadPdf() {
-    if (checkbox) {
+
+    const download = async () =>{
+      await downloadQuiz(quiz, "/templates/quiz-wa-template.docx");
+    } 
+
+    download();
+    /*if (checkbox) {
       //for the answer key
     } else {
       //without the answer key
-    }
+    }*/
   }
 
   return (
-    <div className="p-4">
-      {/* buttons */}
-      <div className="mb-4">
-        <Button
-          variant="outline-primary"
+    <div className="col-span-12">
+      <h1 className="text-header text-dPurple mb-3">Enter Your Text</h1>
+      <div className="flex justify-between w-320">
+        <button
           onClick={() => changeState("text")}
-          className="me-2"
+          className={`${fileState === "text" ? "inner-border-3 inner-border-amethyst text-dPurple bg-magnolia cursor-default" : "text-seasalt bg-amethyst hover:bg-thistle hover:text-dPurple"} text-center w-150 py-1 text-button rounded-md mb-5 drop-shadow-lg`}
         >
-          text
-        </Button>
-        <Button variant="outline-primary" onClick={() => changeState("file")}>
+          Text
+        </button>
+
+        <button
+          onClick={() => changeState("file")}
+          className={`${fileState === "file" ? "inner-border-3 inner-border-amethyst text-dPurple bg-magnolia cursor-default" : "text-seasalt bg-amethyst hover:bg-thistle hover:text-dPurple"} text-center w-150 py-1 text-button rounded-md mb-5 drop-shadow-lg`}
+        >
           File
-        </Button>
+        </button>
       </div>
       {/* Input field */}
+
       <div>
-        <Form>
-          {fileState == "text" ? (
-            <Form.Group
-              className="mb-3 "
-              controlId="exampleForm.ControlTextarea1"
-            >
-              <Form.Control
-                as="textarea"
-                rows={7}
-                placeholder="Enter the Text"
-                onChange={changeGptInput}
-              />
-            </Form.Group>
-          ) : (
-            <Form.Group controlId="formFile" className="mb-3">
-              <Form.Control
+        {fileState == "file" && (
+          <div className="flex justify-between my-5 drop-shadow-md">
+            <div className="w-4/5 bg-seasalt rounded-md">
+              <input
                 type="file"
-                accept=".txt, .docx, .doc, .pdf"
-                onChange={(e) => gettingFileValue(e)}
+                accept=".pdf"
+                ref={fileInputRef}
+                className="font-oswald text-dPurple text-button"
               />
-            </Form.Group>
-          )}
-          <div className="d-flex justify-content-between">
-            <Form.Select className="w-25" onChange={numQuestion}>
-              <option>Number of Questions</option>
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="20">20</option>
-            </Form.Select>
-            <Form.Select className="w-25" onChange={typeQuestion}>
-              <option>Type</option>
-              <option value="multiple choice">Multi-choice Questions</option>
-              <option value="true or false">True/False</option>
-            </Form.Select>
-            <Button
-              variant="outline-primary"
-              onClick={() => getQuiz()}
-              disabled={!gptInput}
+            </div>
+
+            <button
+              className="text-seasalt bg-amethyst text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple"
+              onClick={gettingFileValue}
             >
-              Submit
-            </Button>
+              Extract Text
+            </button>
           </div>
-        </Form>
-      </div>
-      {quiz.length == 0 ? (
-        <div>Ready to take quiz</div>
-      ) : quiz[0] != "loading" ? (
-        <div>
-          <Button variant="outline-primary" onClick={() => attemptQuiz()}>
-            take Quiz
-          </Button>
-          <Button variant="outline-primary" onClick={() => downloadPdf()}>
-            Download the pdf file
-          </Button>
-          <Form.Check
-            inline
-            label="With Answers"
-            name="group1"
-            type="checkbox"
-            id="checkboxPdfAnswer"
-            onChange={() => setCheckbox(!checkbox)}
-          />
+        )}
+
+        <textarea
+          id="message"
+          placeholder={`${fileState === "text" ? "Write your text here..." : "Your extracted text will appear here..."}`}
+          name="message"
+          rows="10"
+          disabled={fileState === "file"}
+          required
+          value={gptInput}
+          className="bg-seasalt font-garamond text-body text-dPurple w-full drop-shadow-md rounded-xl p-1 mb-10"
+          onChange={changeGptInput}
+        ></textarea>
+        <Divider />
+        <div className="flex justify-between">
+        <div className="w-225 flex flex-col">
+          <h1 className="text-header text-dPurple mb-5">Question Options</h1>
+          <div className="flex justify-between mb-3">
+            <label htmlFor="numQuestions" className="text-button text-dPurple">Number:</label>
+            <input id="numQuestions" type="number" min="5" max="30" defaultValue="5" onChange={numQuestion} className="w-70 ml-5 pl-1 text-dPurple bg-seasalt drop-shadow-md rounded-md text-button "/>
+          </div>
+          <div className="flex justify-between mb-5">
+            <label htmlFor="typeQuestions" className="text-button text-dPurple">Type:</label>
+              <select
+              id="typeQuestions"
+              className="bg-seasalt drop-shadow-md rounded-md text-button pr-2 text-dPurple"
+              onChange={typeQuestion}
+            >
+              <option value="multiple choice">Multiple Choice </option>
+              <option value="true/false">True/False</option>
+            </select>           
+          </div>
+          <button
+            onClick={() => getQuiz()}
+            disabled={!gptInput}
+            className="text-seasalt bg-amethyst text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple"
+          >
+            Submit
+          </button>
         </div>
-      ) : (
-        <p>...loading</p>
-      )}
+        <div>
+            {/*First condition: quiz.length == 0 Second condition: quiz[0] != "loading" */}
+          {quiz.length == 0 ? (
+          <div></div>
+          ) : quiz[0] != "loading" ? (
+            <div className="">
+            <h1 className="text-header text-dPurple mb-5">Your Quiz Is Ready!</h1>
+            <button
+              onClick={() => attemptQuiz()}
+              className="text-seasalt bg-iqRed text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-iqLightRed hover:text-dPurple mb-5"
+            >
+              Take Quiz
+            </button><br />
+            <button
+              onClick={() => downloadPdf()}
+              className="text-seasalt bg-amethyst text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple mb-1"
+            >
+              Download PDF
+            </button><br />
+            <input
+              type="checkbox"
+              id="checkboxPdfAnswer"
+              onChange={() => setCheckbox(!checkbox)}
+              className="w-8"
+            />
+          <label htmlFor="checkboxPdfAnswer" className="text-body text-dPurple">Include answers</label>
+          </div>
+          ) : (
+            <div>
+                <h1 className="text-header text-dPurple mb-5">Loading...</h1>
+                <LoadingSpinner />
+            </div>
+          )}        
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
