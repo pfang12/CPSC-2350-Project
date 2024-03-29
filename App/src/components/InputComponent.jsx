@@ -14,7 +14,8 @@ function InputComponent() {
   const [numberQuestions, setNumberQuestions] = useState("5");
   const [questionType, setQuestionType] = useState("multiple choice");
   const [gptInput, setGptInput] = useState("");
-  const [checkbox, setCheckbox] = useState(false);
+  const [ansCheckbox, setAnsCheckbox] = useState(false);
+  const [pwdCheckbox, setPwdCheckbox] = useState(false);
   const fileInputRef = useRef(null);
 
   function changeState(val) {
@@ -60,17 +61,23 @@ function InputComponent() {
   }
   //download function
   function downloadPdf() {
-
     const download = async () =>{
-      await downloadQuiz(quiz, "/templates/quiz-wa-template.docx");
+      if(ansCheckbox){
+        if(questionType === "multiple choice"){
+          await downloadQuiz(quiz, "/templates/quiz-mcq-wa-template.docx");
+        } else if(questionType === "true/false"){
+          await downloadQuiz(quiz, "/templates/quiz-tf-wa-template.docx");
+        }
+      } else {
+        if(questionType === "multiple choice"){
+          await downloadQuiz(quiz, "/templates/quiz-mcq-na-template.docx");  
+        } else if(questionType === "true/false"){
+          await downloadQuiz(quiz, "/templates/quiz-tf-na-template.docx");
+        }
+      }
     } 
 
     download();
-    /*if (checkbox) {
-      //for the answer key
-    } else {
-      //without the answer key
-    }*/
   }
 
   return (
@@ -174,7 +181,7 @@ function InputComponent() {
             <input
               type="checkbox"
               id="checkboxPdfAnswer"
-              onChange={() => setCheckbox(!checkbox)}
+              onChange={() => setAnsCheckbox(!ansCheckbox)}
               className="w-8"
             />
           <label htmlFor="checkboxPdfAnswer" className="text-body text-dPurple">Include answers</label>

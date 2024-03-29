@@ -121,6 +121,7 @@ const startExtractJob = async(token, assetID) => {
             console.log("Text extraction failed :(");
             console.log("Code: ", result.data.error.code);
             console.log("Message: ", result.data.error.message);
+            return 500;
         }
     } catch (error) {
         console.log("Error: ", error);
@@ -203,14 +204,14 @@ const quizDataBuilder = (quiz) => {
 
 // retrieve docx template from public folder
 const retrieveDocxTemplate = async (template) => {
-    console.log("Retrieving doc template!")
+    console.log("Retrieving doc template...")
     try {
         const file = await fetch(template);
 
         const arrayBuffer = await file.arrayBuffer();
         
         const docxTemplate = new Blob([new Uint8Array(arrayBuffer)], {type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"})
-        
+                
         return docxTemplate;
     } catch(error){
         console.log("Error: ", error);
