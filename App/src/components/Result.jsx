@@ -1,26 +1,40 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { QuizContext } from "../context/QuizContext";
-
+import { feedbackRequest } from '../api/gptapi';
 import { useNavigate } from "react-router-dom";
 import Divider from "./Divider";
+
 function Result() {
     const { quiz } = useContext(QuizContext);
     const navigate = useNavigate();
+    const [feedback, setFeedback] = useState('');
 
     useEffect(() => {
         if (quiz.length == 0) {
             homePage();
+        } else {
+            getFeedback();
         }
     }, [quiz]);
+    
     function homePage() {
         navigate("/*");
     }
     const getScore = () => {
         let score = 0;
-        quiz.map((data) => {
-            if (data.answer === data.userResponse) return score++;
+        quiz.forEach((data) => {
+            if (data.answer === data.userResponse) {
+                score++;
+            }
         });
         return score;
+    };
+
+    const getFeedback = async () => {
+        const wrongQuestions = quiz.filter(q => q.answer !== q.userResponse);
+        const rightQuestions = quiz.filter(q => q.answer === q.userResponse);
+        const feedback = await feedbackRequest(wrongQuestions, rightQuestions);
+        setFeedback(feedback);
     };
 
     return (
@@ -43,7 +57,13 @@ function Result() {
             </div>
             <Divider />
             <h1 className="text-header text-dPurple">Feedback</h1>
-            {/*The feedback text goes here*/}
+            
+            {/* Feedback Section */}
+            <div className="feedback-section my-4">
+                <h2 className="text-xl font-semibold mb-3">Feedback</h2>
+                <p>{feedback}</p>
+            </div>
+            
             <button
                 type="button"
                 className="text-seasalt bg-amethyst text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple my-6 mr-4"
@@ -52,9 +72,10 @@ function Result() {
                 Home Page
             </button>
             <button className="text-dPurple bg-magnolia inner-border-3 inner-border-amethyst text-center px-2 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple hover:inner-border-thistle">Download Report</button>
-            </div>
+        </div>
     );
 }
+
 export const DisplayQuiz = ({ data, index }) => {
     return (
         <div className="mb-10">
