@@ -14,7 +14,10 @@ function InputComponent() {
   const [numberQuestions, setNumberQuestions] = useState("5");
   const [questionType, setQuestionType] = useState("multiple choice");
   const [gptInput, setGptInput] = useState("");
-  const [checkbox, setCheckbox] = useState(false);
+  const [ansCheckbox, setAnsCheckbox] = useState(false);
+  const [pwdCheckbox, setPwdCheckbox] = useState(false);
+  const [pwd, setPwd] = useState("");
+  const [isDownloadLoading, setDownloadLoading] = useState(false);
   const fileInputRef = useRef(null);
 
   function changeState(val) {
@@ -30,6 +33,11 @@ function InputComponent() {
   function changeGptInput(e) {
     setGptInput(e.target.value);
   }
+
+  function setPwdValue(e) {
+    setPwd(e.target.value);
+  }
+
   const gptCallResponse = async () => {
     setQuiz(["loading"]);
     console.log(gptInput);
@@ -70,11 +78,6 @@ function InputComponent() {
     };
 
     download();
-    /*if (checkbox) {
-      //for the answer key
-    } else {
-      //without the answer key
-    }*/
   }
 
   return (

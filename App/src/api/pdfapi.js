@@ -121,6 +121,7 @@ const startExtractJob = async(token, assetID) => {
             console.log("Text extraction failed :(");
             console.log("Code: ", result.data.error.code);
             console.log("Message: ", result.data.error.message);
+            return 500;
         }
     } catch (error) {
         console.log("Error: ", error);
@@ -203,14 +204,14 @@ const quizDataBuilder = (quiz) => {
 
 // retrieve docx template from public folder
 const retrieveDocxTemplate = async (template) => {
-    console.log("Retrieving doc template!")
+    console.log("Retrieving doc template...")
     try {
         const file = await fetch(template);
 
         const arrayBuffer = await file.arrayBuffer();
         
         const docxTemplate = new Blob([new Uint8Array(arrayBuffer)], {type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"})
-        
+                
         return docxTemplate;
     } catch(error){
         console.log("Error: ", error);
@@ -292,8 +293,71 @@ const downloadPDF = async (downloadURI) => {
     }
 }
 
+const encryptPDF = async (token, downloadURI, pwd) => {
+
+    const apiURL = "https://pdf-services-ue1.adobe.io/operation/protectpdf"
+    
+    try{
+        const response = await axios.get(downloadURI, {
+            responseType: "blob"
+        });
+
+        const pdfFile = new Blob([response.data]);
+
+        const {uploadUri, assetID} = await generatePresignedURI(token, "pdf");
+
+        const uploadSuccessful = await uploadFile(pdfFile, uploadUri, "pdf");
+
+        if(uploadSuccessful === 200){
+            const data = {
+                assetID: assetID,
+                passwordProtection: {
+                    userPassword: pwd
+                },
+                encryptionAlgorithm: "AES_256"
+            }
+
+            const response = await axios.post(apiURL, data, {
+                headers: {
+                    Authorization: token,
+                    "x-api-key": clientID,
+                    "Content-Type": "application/json"
+                }
+            });
+
+            console.log("polling for job completion...");
+            let jobStatus;
+            let result;
+            do {
+                result = await axios.get(response.headers.location, {
+                    headers: {
+                        Authorization: token,
+                        "x-api-key": clientID
+                    }
+                });
+
+                jobStatus = result.data.status;
+                console.log("Current job status: ", jobStatus);
+
+                await new Promise((resolve) => setTimeout(resolve, 1000));
+            } while (jobStatus != "done" && jobStatus !== "failed");
+
+            if(jobStatus === "done") {
+                return result.data.asset.downloadUri;
+            } else if(jobStatus === "failed") {
+                console.log("Document encryption failed :(");
+                console.log("Code: ", result.data.error.code);
+                console.log("Message: ", result.data.error.message);
+            }
+        }
+        
+    } catch(error){
+        console.log("Error: ", error);
+    }
+}
+
 // quiz download function
-export const downloadQuiz = async (quiz, template) => {
+export const downloadQuiz = async (quiz, template, pwd = null) => {
 
     const data = quizDataBuilder(quiz); 
     
@@ -308,7 +372,14 @@ export const downloadQuiz = async (quiz, template) => {
     if(uploadSuccessful === 200){
         const downloadUri = await startDocGeneration(token, assetID, data);
 
-        await downloadPDF(downloadUri);            
-        //console.log(downloadUri);       
+        if(pwd){
+    console.log("Encrypting file...");
+            const encryptedPDFUri = await encryptPDF(token, downloadUri, pwd);
+            await downloadPDF(encryptedPDFUri);            
+        } else {
+            await downloadPDF(downloadUri);
+        }
     }
+
+    return "done";
 }
