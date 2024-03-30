@@ -56,12 +56,11 @@ function Result() {
                 ))}
             </div>
             <Divider />
-            <h1 className="text-header text-dPurple">Feedback</h1>
+            <h1 className="text-header text-dPurple mb-3">Feedback</h1>
             
             {/* Feedback Section */}
             <div className="feedback-section my-4">
-                <h2 className="text-xl font-semibold mb-3">Feedback</h2>
-                <p>{feedback}</p>
+                <p className="text-dPurple">{feedback}</p>
             </div>
             
             <button
