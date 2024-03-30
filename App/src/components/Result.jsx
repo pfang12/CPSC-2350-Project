@@ -37,6 +37,35 @@ function Result() {
         setFeedback(feedback);
     };
 
+    const generateReportJson = () => {
+        const report = {
+            score: `${getScore()} / ${quiz.length}`,
+            questions: quiz.map(q => ({
+                question: q.question,
+                options: q.options,
+                userResponse: q.userResponse,
+                correctAnswer: q.answer,
+                explanation: q.explanation,
+            })),
+            feedback: feedback
+        };
+
+        return JSON.stringify(report, null, 2); 
+    };
+
+    const downloadReportJson = () => {
+        const reportJson = generateReportJson();
+        const blob = new Blob([reportJson], { type: "application/json" });
+        const href = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = href;
+        link.download = "quiz_report.json";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(href);
+    };
+
     return (
         <div className="col-span-12">
             <h1 className="text-4xl text-dPurple mb-6">
@@ -47,8 +76,10 @@ function Result() {
             </h1>
             <div className="flex gap-4 mb-10">
                 <button className="text-seasalt bg-amethyst text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple" onClick={homePage}>Home Page</button>
-                <button className="text-dPurple bg-magnolia inner-border-3 inner-border-amethyst text-center px-2 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple hover:inner-border-thistle">Download Report</button>
-            </div>
+                <button 
+                className="text-dPurple bg-magnolia inner-border-3 inner-border-amethyst text-center px-2 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple hover:inner-border-thistle"
+                onClick={downloadReportJson}> Download Report </button> {/* replace with downloadReport after pdf generation is complete that calls downloadReportJson or replace downloadReportJson with the downloadReport pdf function and have it call generateReportJson*/}
+            </div> 
             <Divider /> 
             <div>
                 {quiz.map((data, i) => (
