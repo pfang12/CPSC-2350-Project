@@ -79,6 +79,11 @@ function InputComponent() {
 
     download();
   }
+  
+  //Clear the Text Input box
+  function clearTextarea(){
+    setGptInput("");
+  }
 
   return (
     <div className="col-span-12">
@@ -130,6 +135,7 @@ function InputComponent() {
           </div>
         )}
 
+        <div className="flex flex-col">
         <textarea
           id="message"
           placeholder={`${
@@ -142,9 +148,17 @@ function InputComponent() {
           disabled={fileState === "file"}
           required
           value={gptInput}
-          className="bg-seasalt font-garamond text-body text-dPurple w-full drop-shadow-md rounded-xl p-1 mb-10"
+          className="bg-seasalt font-garamond text-body text-dPurple w-full drop-shadow-md rounded-xl p-1 mb-2"
           onChange={changeGptInput}
         ></textarea>
+        <button
+          className="text-dPurple bg-magnolia text-center w-150 py-1 text-button rounded-md inner-border-3 inner-border-amethyst drop-shadow-lg hover:bg-thistle hover:text-dPurple hover:inner-border-thistle mb-10"
+          onClick={clearTextarea}
+        >
+          Clear
+        </button>
+        </div>
+        
         <Divider />
         <div className="flex justify-between">
           <div className="w-225 flex flex-col">
