@@ -30,7 +30,6 @@ jobs:
           cache: 'npm'
           
       - name: Execute Tests
-        working-directory: ./App
         run : |
           npm ci
           npm run test
