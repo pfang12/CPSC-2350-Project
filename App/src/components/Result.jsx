@@ -3,6 +3,8 @@ import { QuizContext } from "../context/QuizContext";
 import { feedbackRequest } from '../api/gptapi';
 import { useNavigate } from "react-router-dom";
 import Divider from "./Divider";
+import LoadingSpinner from "./LoadingSpinner";
+import { downloadQuiz } from "../api/pdfapi";
 
 function Result() {
     const { quiz } = useContext(QuizContext);
@@ -50,21 +52,14 @@ function Result() {
             feedback: feedback
         };
 
-        return JSON.stringify(report, null, 2); 
-    };
-
-    const downloadReportJson = () => {
-        const reportJson = generateReportJson();
-        const blob = new Blob([reportJson], { type: "application/json" });
-        const href = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = href;
-        link.download = "quiz_report.json";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(href);
-    };
+        const template = "/templates/report-template.docx";
+        
+        const downloadReport = async(report, template) => {
+            await downloadQuiz(report, template, false, true)    
+        };    
+        
+        downloadReport(report, template);
+    };    
 
     return (
         <div className="col-span-12">
@@ -77,8 +72,8 @@ function Result() {
             <div className="flex gap-4 mb-10">
                 <button className="text-seasalt bg-amethyst text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple" onClick={homePage}>Home Page</button>
                 <button 
-                className="text-dPurple bg-magnolia inner-border-3 inner-border-amethyst text-center px-2 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple hover:inner-border-thistle"
-                onClick={downloadReportJson}> Download Report </button> {/* replace with downloadReport after pdf generation is complete that calls downloadReportJson or replace downloadReportJson with the downloadReport pdf function and have it call generateReportJson*/}
+                className="text-dPurple bg-magnolia inner-border-3 inner-border-amethyst text-center px-2 py-1 text-button rounded-md drop-shadow-lg enabled:hover:bg-thistle enabled:hover:inner-border-thistle disabled:opacity-70"
+                onClick={generateReportJson} disabled={feedback === ""}>Download Report </button>
             </div> 
             <Divider /> 
             <div>
@@ -89,9 +84,15 @@ function Result() {
             <Divider />
             <h1 className="text-header text-dPurple mb-3">Feedback</h1>
             
-            {/* Feedback Section */}
             <div className="feedback-section my-4">
-                <p className="text-dPurple">{feedback}</p>
+                {feedback == "" ? (
+                    <div>
+                        <h1 className="text-header text-dPurple mb-5">Loading...</h1>
+                        <LoadingSpinner />
+                    </div>
+                ) : (
+                    <p className="text-dPurple bg-seasalt inner-border-3 inner-border-thistle rounded-md p-2">{feedback}</p>
+                )}
             </div>
             
             <button
@@ -101,7 +102,7 @@ function Result() {
             >
                 Home Page
             </button>
-            <button className="text-dPurple bg-magnolia inner-border-3 inner-border-amethyst text-center px-2 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple hover:inner-border-thistle">Download Report</button>
+            <button className="text-dPurple bg-magnolia inner-border-3 inner-border-amethyst text-center px-2 py-1 text-button rounded-md drop-shadow-lg enabled:hover:bg-thistle enabled:hover:inner-border-thistle disabled:opacity-70" disabled={feedback === ""} onClick={generateReportJson}>Download Report</button>
         </div>
     );
 }

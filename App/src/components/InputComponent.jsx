@@ -73,8 +73,29 @@ function InputComponent() {
   }
   //download function
   function downloadPdf() {
+    setDownloadLoading(true);
+    
     const download = async () => {
-      await downloadQuiz(quiz, "/templates/quiz-wa-template.docx");
+      let status = "in progress";
+      let templatePath = "";
+
+      if(questionType === "multiple choice"){
+        templatePath = ansCheckbox ? "/templates/quiz-mcq-wa-template.docx" : "/templates/quiz-mcq-na-template.docx"
+      } else if(questionType === "true/false") {
+        templatePath = ansCheckbox ? "/templates/quiz-tf-wa-template.docx" : "/templates/quiz-tf-na-template.docx"
+      }
+
+      if(pwdCheckbox && pwd) {
+        status = await downloadQuiz(quiz, templatePath, pwd);
+      } else {
+        status = await downloadQuiz(quiz, templatePath);
+      }
+
+      if(status === "done"){
+        setDownloadLoading(false);
+        setPwdCheckbox(false);
+        setPwd("");
+      }     
     };
 
     download();
@@ -208,7 +229,7 @@ function InputComponent() {
             {/*First condition: quiz.length == 0 Second condition: quiz[0] != "loading" */}
             {quiz.length == 0 ? (
               <div></div>
-            ) : quiz[0] != "loading" ? (
+            ) : (quiz[0] != "loading" && !isDownloadLoading) ? (
               <div className="">
                 <h1 className="text-header text-dPurple mb-5">
                   Your Quiz Is Ready!
@@ -220,25 +241,30 @@ function InputComponent() {
                   Take Quiz
                 </button>
                 <br />
-                <button
-                  onClick={() => downloadPdf()}
-                  className="text-seasalt bg-amethyst text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple mb-1"
-                >
-                  Download PDF
-                </button>
-                <br />
-                <input
-                  type="checkbox"
-                  id="checkboxPdfAnswer"
-                  onChange={() => setCheckbox(!checkbox)}
-                  className="w-8"
-                />
-                <label
-                  htmlFor="checkboxPdfAnswer"
-                  className="text-body text-dPurple"
-                >
-                  Include answers
-                </label>
+                <div className="flex">
+                  <button
+                    onClick={() => downloadPdf()}
+                    className="text-seasalt bg-amethyst text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple mb-1">
+                    Download PDF
+                  </button>
+                  <div>
+                    <input
+                      type="checkbox"
+                      id="checkboxPdfAnswer"
+                      onChange={() => setAnsCheckbox(!ansCheckbox)}
+                      className="w-8"
+                    />
+                    <label htmlFor="checkboxPdfAnswer" className="text-body text-dPurple">Include answers</label><br />
+                    <input 
+                      type="checkbox"
+                      id="checkboxPassword"
+                      onChange={() => setPwdCheckbox(!pwdCheckbox)}
+                      className="w-8"
+                    />
+                    <label htmlFor="checkboxPassword" className="text-body text-dPurple">Lock with password</label>
+                  </div>
+                </div>
+                {pwdCheckbox ? (<input type="password" placeholder="Write your password" onChange={setPwdValue} className="bg-seasalt text-dPurple rounded-lg font-garamond drop-shadow-lg px-0.5 py-1 w-150 mt-1.5"/>) : (<></>)}
               </div>
             ) : (
               <div>
