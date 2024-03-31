@@ -357,9 +357,14 @@ const encryptPDF = async (token, downloadURI, pwd) => {
 }
 
 // quiz download function
-export const downloadQuiz = async (quiz, template, pwd = null) => {
+export const downloadQuiz = async (quiz, template, pwd = null, report = false) => {
 
-    const data = quizDataBuilder(quiz); 
+    let data;
+    if(!report){
+        data = quizDataBuilder(quiz); 
+    } else {
+        data = quiz; 
+    }
     
     const templateDoc = await retrieveDocxTemplate(template);
     
@@ -373,7 +378,7 @@ export const downloadQuiz = async (quiz, template, pwd = null) => {
         const downloadUri = await startDocGeneration(token, assetID, data);
 
         if(pwd){
-    console.log("Encrypting file...");
+            console.log("Encrypting file...");
             const encryptedPDFUri = await encryptPDF(token, downloadUri, pwd);
             await downloadPDF(encryptedPDFUri);            
         } else {
