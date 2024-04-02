@@ -80,9 +80,9 @@ function InputComponent() {
       let templatePath = "";
 
       if(questionType === "multiple choice"){
-        templatePath = ansCheckbox ? "/templates/quiz-mcq-wa-template.docx" : "/templates/quiz-mcq-na-template.docx"
+        templatePath = ansCheckbox ? "/CPSC-2350-Project/templates/quiz-mcq-wa-template.docx" : "/CPSC-2350-Project/templates/quiz-mcq-na-template.docx"
       } else if(questionType === "true/false") {
-        templatePath = ansCheckbox ? "/templates/quiz-tf-wa-template.docx" : "/templates/quiz-tf-na-template.docx"
+        templatePath = ansCheckbox ? "/CPSC-2350-Project/templates/quiz-tf-wa-template.docx" : "/CPSC-2350-Project/templates/quiz-tf-na-template.docx"
       }
 
       if(pwdCheckbox && pwd) {
@@ -94,6 +94,7 @@ function InputComponent() {
       if(status === "done"){
         setDownloadLoading(false);
         setPwdCheckbox(false);
+        setAnsCheckbox(false);
         setPwd("");
       }     
     };
