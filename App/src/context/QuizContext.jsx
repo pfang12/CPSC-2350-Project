@@ -5,7 +5,7 @@ export const QuizContext = createContext(null);
 const QuizContextProvider = (props) => {
   const [quiz, setQuiz] = useState();
   if (!quiz) {
-    setQuiz([]);
+    setQuiz(props.defaultQuiz || []);
   }
   console.log(quiz);
   return (

@@ -74,7 +74,7 @@ function InputComponent() {
   //download function
   function downloadPdf() {
     setDownloadLoading(true);
-    
+
     const download = async () => {
       let status = "in progress";
       let templatePath = "";
@@ -85,25 +85,25 @@ function InputComponent() {
         templatePath = ansCheckbox ? "/CPSC-2350-Project/templates/quiz-tf-wa-template.docx" : "/CPSC-2350-Project/templates/quiz-tf-na-template.docx"
       }
 
-      if(pwdCheckbox && pwd) {
+      if (pwdCheckbox && pwd) {
         status = await downloadQuiz(quiz, templatePath, pwd);
       } else {
         status = await downloadQuiz(quiz, templatePath);
       }
 
-      if(status === "done"){
+      if (status === "done") {
         setDownloadLoading(false);
         setPwdCheckbox(false);
         setAnsCheckbox(false);
         setPwd("");
-      }     
+      }
     };
 
     download();
   }
-  
+
   //Clear the Text Input box
-  function clearTextarea(){
+  function clearTextarea() {
     setGptInput("");
   }
 
@@ -158,29 +158,29 @@ function InputComponent() {
         )}
 
         <div className="flex flex-col">
-        <textarea
-          id="message"
-          placeholder={`${
-            fileState === "text"
-              ? "Write your text here..."
-              : "Your extracted text will appear here..."
-          }`}
-          name="message"
-          rows="10"
-          disabled={fileState === "file"}
-          required
-          value={gptInput}
-          className="bg-seasalt font-garamond text-body text-dPurple w-full drop-shadow-md rounded-xl p-1 mb-2"
-          onChange={changeGptInput}
-        ></textarea>
-        <button
-          className="text-dPurple bg-magnolia text-center w-150 py-1 text-button rounded-md inner-border-3 inner-border-amethyst drop-shadow-lg hover:bg-thistle hover:text-dPurple hover:inner-border-thistle mb-10"
-          onClick={clearTextarea}
-        >
-          Clear
-        </button>
+          <textarea
+            id="message"
+            placeholder={`${
+              fileState === "text"
+                ? "Write your text here..."
+                : "Your extracted text will appear here..."
+            }`}
+            name="message"
+            rows="10"
+            disabled={fileState === "file"}
+            required
+            value={gptInput}
+            className="bg-seasalt font-garamond text-body text-dPurple w-full drop-shadow-md rounded-xl p-1 mb-2"
+            onChange={changeGptInput}
+          ></textarea>
+          <button
+            className="text-dPurple bg-magnolia text-center w-150 py-1 text-button rounded-md inner-border-3 inner-border-amethyst drop-shadow-lg hover:bg-thistle hover:text-dPurple hover:inner-border-thistle mb-10"
+            onClick={clearTextarea}
+          >
+            Clear
+          </button>
         </div>
-        
+
         <Divider />
         <div className="flex justify-between">
           <div className="w-225 flex flex-col">
@@ -230,7 +230,7 @@ function InputComponent() {
             {/*First condition: quiz.length == 0 Second condition: quiz[0] != "loading" */}
             {quiz.length == 0 ? (
               <div></div>
-            ) : (quiz[0] != "loading" && !isDownloadLoading) ? (
+            ) : quiz[0] != "loading" && !isDownloadLoading ? (
               <div className="">
                 <h1 className="text-header text-dPurple mb-5">
                   Your Quiz Is Ready!
@@ -245,7 +245,8 @@ function InputComponent() {
                 <div className="flex">
                   <button
                     onClick={() => downloadPdf()}
-                    className="text-seasalt bg-amethyst text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple mb-1">
+                    className="text-seasalt bg-amethyst text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple mb-1"
+                  >
                     Download PDF
                   </button>
                   <div>
@@ -255,17 +256,37 @@ function InputComponent() {
                       onChange={() => setAnsCheckbox(!ansCheckbox)}
                       className="w-8"
                     />
-                    <label htmlFor="checkboxPdfAnswer" className="text-body text-dPurple">Include answers</label><br />
-                    <input 
+                    <label
+                      htmlFor="checkboxPdfAnswer"
+                      className="text-body text-dPurple"
+                    >
+                      Include answers
+                    </label>
+                    <br />
+                    <input
                       type="checkbox"
                       id="checkboxPassword"
                       onChange={() => setPwdCheckbox(!pwdCheckbox)}
                       className="w-8"
                     />
-                    <label htmlFor="checkboxPassword" className="text-body text-dPurple">Lock with password</label>
+                    <label
+                      htmlFor="checkboxPassword"
+                      className="text-body text-dPurple"
+                    >
+                      Lock with password
+                    </label>
                   </div>
                 </div>
-                {pwdCheckbox ? (<input type="password" placeholder="Write your password" onChange={setPwdValue} className="bg-seasalt text-dPurple rounded-lg font-garamond drop-shadow-lg px-0.5 py-1 w-150 mt-1.5"/>) : (<></>)}
+                {pwdCheckbox ? (
+                  <input
+                    type="password"
+                    placeholder="Write your password"
+                    onChange={setPwdValue}
+                    className="bg-seasalt text-dPurple rounded-lg font-garamond drop-shadow-lg px-0.5 py-1 w-150 mt-1.5"
+                  />
+                ) : (
+                  <></>
+                )}
               </div>
             ) : (
               <div>
