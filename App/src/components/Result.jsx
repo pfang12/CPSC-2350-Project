@@ -52,7 +52,7 @@ function Result() {
       feedback: feedback,
     };
 
-    const template = "/templates/report-template.docx";
+    const template = "/CPSC-2350-Project/templates/report-template.docx";
 
     const downloadReport = async (report, template) => {
       await downloadQuiz(report, template, false, true);
