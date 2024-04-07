@@ -5,11 +5,13 @@ import { useNavigate } from "react-router-dom";
 import Divider from "./Divider";
 import LoadingSpinner from "./LoadingSpinner";
 import { downloadQuiz } from "../api/pdfapi";
+import logo from "../components/images/logo.png";
 
 function Result() {
   const { quiz } = useContext(QuizContext);
   const navigate = useNavigate();
   const [feedback, setFeedback] = useState("");
+  const [isLoadingReport, setLoadingReport] = useState(false);
 
   useEffect(() => {
     if (quiz.length == 0) {
@@ -39,7 +41,9 @@ function Result() {
     setFeedback(feedback);
   };
 
-  const generateReportJson = () => {
+  const generateReportJson = () => {    
+    let status = "in progress";
+    setLoadingReport(true);
     const report = {
       score: `${getScore()} / ${quiz.length}`,
       questions: quiz.map((q) => ({
@@ -55,7 +59,12 @@ function Result() {
     const template = "/CPSC-2350-Project/templates/report-template.docx";
 
     const downloadReport = async (report, template) => {
-      await downloadQuiz(report, template, false, true);
+      
+      status = await downloadQuiz(report, template, false, true);
+
+      if (status === "done"){
+        setLoadingReport(false);
+      }
     };
 
     downloadReport(report, template);
@@ -83,6 +92,10 @@ function Result() {
         >
           Download Report{" "}
         </button>
+        {isLoadingReport ? (<div className="flex gap-2">
+          <img src={logo} alt="Intelliquiz logo" className="w-12 h-12 animate-fade-in-out"/>
+          <h1 className="text-dPurple text-button">Loading...</h1>  
+        </div>) : (<></>)}
       </div>
       <Divider />
       <div>
@@ -105,22 +118,27 @@ function Result() {
           </p>
         )}
       </div>
-
+      <div className="flex gap-4">
       <button
         type="button"
-        className="text-seasalt bg-amethyst text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple my-6 mr-4"
+        className="text-seasalt bg-amethyst text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple my-6"
         onClick={homePage}
       >
         Home Page
       </button>
       <button
-        className="text-dPurple bg-magnolia inner-border-3 inner-border-amethyst text-center px-2 py-1 text-button rounded-md drop-shadow-lg enabled:hover:bg-thistle enabled:hover:inner-border-thistle disabled:opacity-70"
+        className="text-dPurple bg-magnolia inner-border-3 inner-border-amethyst text-center px-2 py-1 text-button rounded-md drop-shadow-lg enabled:hover:bg-thistle enabled:hover:inner-border-thistle disabled:opacity-70 my-6"
         disabled={feedback === ""}
         onClick={generateReportJson}
         data-testid="download-report-button"
       >
         Download Report
-      </button>
+      </button>     
+      {isLoadingReport ? (<div className="flex gap-2 my-6">
+        <img src={logo} alt="Intelliquiz logo" className="w-12 h-12 animate-fade-in-out"/>
+        <h1 className="text-dPurple text-button">Loading...</h1>  
+      </div>) : (<></>)}
+      </div>
     </div>
   );
 }
