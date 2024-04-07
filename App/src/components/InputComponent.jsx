@@ -247,7 +247,7 @@ function InputComponent() {
                     onClick={() => downloadPdf()}
                     className="text-seasalt bg-amethyst text-center w-150 py-1 text-button rounded-md drop-shadow-lg hover:bg-thistle hover:text-dPurple mb-1"
                   >
-                    Download PDF
+                    Download Quiz
                   </button>
                   <div>
                     <input

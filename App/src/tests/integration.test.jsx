@@ -155,7 +155,7 @@ describe("for the download feature", () => {
         </BrowserRouter>
       </QuizContextProvider>
     );
-    const downloadButton = screen.getByText("Download PDF");
+    const downloadButton = screen.getByText("Download Quiz");
     fireEvent.click(downloadButton);
     await waitFor(() => {
       expect(downloadQuiz).toHaveBeenCalledTimes(1);
@@ -243,7 +243,7 @@ describe("InputComponent encryption feature", () => {
     const checkbox = screen.getByLabelText("Lock with password");
     fireEvent.click(checkbox);
     fireEvent.click(checkbox);
-    const downloadButton = screen.getByText("Download PDF");
+    const downloadButton = screen.getByText("Download Quiz");
     fireEvent.click(downloadButton);
     const encrpytPDF = vi.fn();
     encrpytPDF.mockResolvedValueOnce("give the encrypted file back");
@@ -276,7 +276,7 @@ describe("InputComponent encryption feature", () => {
     fireEvent.click(checkbox);
     fireEvent.click(checkbox);
 
-    const downloadButton = screen.getByText("Download PDF");
+    const downloadButton = screen.getByText("Download Quiz");
     fireEvent.click(downloadButton);
     const encrpytPDF = vi.fn();
     encrpytPDF.mockResolvedValueOnce("give the encrypted file back");
